@@ -1,4 +1,6 @@
 // src/app/api/login/route.js
+// this route is for pin based loogin
+// will be removed soon enough
 import { NextResponse } from "next/server";
 
 export async function GET(req) {

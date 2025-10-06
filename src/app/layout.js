@@ -40,7 +40,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
 
-                <Container>{children}</Container>
+                {children}
 
       </body>
     </html>
