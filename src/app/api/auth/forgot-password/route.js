@@ -1,11 +1,10 @@
 import clientPromise from "@/lib/mongodb";
 import jwt from "jsonwebtoken";
-import { headers } from "next/headers";
+
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API);
 
-const baseURL = headers.get("host")
 
 
 export async function POST(req, res) {
