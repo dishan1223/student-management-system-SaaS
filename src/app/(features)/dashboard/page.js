@@ -60,19 +60,12 @@ export default function Home() {
   const [selectedBatch, setSelectedBatch] = useState("");
   const [selectedStudyDays, setSelectedStudyDays] = useState("");
 
-  // PIN login state
-  const [pinEntered, setPinEntered] = useState(false);
-  const [pinInput, setPinInput] = useState("");
+
 
   // Check localStorage for PIN on mount
-  useEffect(() => {
-    const storedPin = localStorage.getItem("userPin");
-    if (storedPin) setPinEntered(true);
-  }, []);
-
   // Fetch students
   useEffect(() => {
-    if (!pinEntered) return; // Don't fetch until PIN entered
+    
     async function fetchStudents() {
       try {
         const res = await fetch(`/api/students`);
@@ -91,7 +84,7 @@ export default function Home() {
       }
     }
     fetchStudents();
-  }, [pinEntered]);
+  }, []);
 
   // Safe defaults for mapping
   const safeStudents = Array.isArray(students) ? students : [];
@@ -133,68 +126,6 @@ export default function Home() {
       alert("Server error");
     }
   };
-
-  // Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem("userPin");
-    setPinEntered(false);
-    setPinInput("");
-  };
-
-    // Show PIN login form if PIN not entered
-    if (!pinEntered) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-                <div className="w-full max-w-md mx-4">
-                    <form onSubmit={handlePinSubmit} className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl p-8 shadow-2xl shadow-blue-500/10">
-                        <div className="text-center mb-8">
-                            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                            </div>
-                            <h2 className="text-2xl font-bold text-gray-800 mb-2">Secure Access</h2>
-                            <p className="text-gray-600">Enter your PIN to continue</p>
-                        </div>
-
-                        <div className="space-y-6">
-                            <div className="relative">
-                                <input
-                                    type="password"
-                                    value={pinInput}
-                                    onChange={(e) => setPinInput(e.target.value)}
-                                    placeholder="Enter PIN"
-                                    className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-center text-lg font-mono tracking-widest placeholder-gray-400"
-                                />
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-4">
-                                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </div>
-                            </div>
-
-                            <button 
-                                type="submit" 
-                                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                            >
-                                <span className="flex items-center justify-center">
-                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                                    </svg>
-                                    Login
-                                </span>
-                            </button>
-                        </div>
-
-                        <div className="mt-6 text-center">
-                            <p className="text-sm text-gray-500">Protected by secure authentication</p>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        );
-    }
  
   // Main dashboard content
   return (
@@ -328,16 +259,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Logout Button at Bottom */}
-        <div className="flex justify-center mt-12 pb-8">
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition-all duration-200 hover:shadow-md hover:-translate-y-1"
-          >
-            <LogOut className="w-5 h-5" />
-            <span>Logout</span>
-          </button>
-        </div>
+        
 
       </div>
     </div>
