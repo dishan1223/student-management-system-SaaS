@@ -18,10 +18,10 @@ import {
   Save,
   Handshake
 } from "lucide-react";
-import useRequirePin from "@/utils/useRequirePin";
+
 
 export default function StudentDetails() {
-    useRequirePin();
+
   const { slug } = useParams();
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);

@@ -21,6 +21,8 @@ import {
   LogOut
 } from "lucide-react";
 
+import useRequirePaid from "@/utils/requireAuth";
+
 // Modern Button Component
 function ModernButton({ title, href, icon: Icon, variant = "default", visibility }) {
   const baseClasses = "group relative flex items-center justify-center gap-3 px-6 py-4 rounded-2xl font-semibold transition-all duration-200 hover:-translate-y-1 hover:shadow-md";
@@ -52,6 +54,9 @@ function ModernDummyButton({ title, icon: Icon }) {
 }
 
 export default function Home() {
+
+
+  useRequirePaid()
   const [students, setStudents] = useState([]);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);

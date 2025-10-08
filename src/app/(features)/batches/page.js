@@ -2,50 +2,19 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, Clock, BookOpen, GraduationCap, DollarSign } from "lucide-react";
+import useRequirePaid from "@/utils/requireAuth";
 
-// auth
-import useRequirePin from "@/utils/useRequirePin";
+
+
 
 export default function Batches() {
-    useRequirePin();
+    useRequirePaid()
 
     const [pin, setPin] = useState(null);
     const [batches, setBatches] = useState([]);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
-    // Load PIN from localStorage
-    useEffect(() => {
-        const storedPin = localStorage.getItem("userPin");
-        if (storedPin) {
-            setPin(storedPin);
-        } else {
-            setLoading(false); // stop loading if no PIN
-        }
-    }, []);
-
-    // Fetch batches when PIN is available
-    useEffect(() => {
-        if (!pin) return;
-
-        async function fetchBatches() {
-            try {
-                const res = await fetch(`/api/batch`);
-
-                if (!res.ok) throw new Error("Failed to fetch batches");
-
-                const data = await res.json();
-                setBatches(Array.isArray(data) ? data : []);
-            } catch (err) {
-                console.error("Failed to fetch batches", err);
-                setBatches([]);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        fetchBatches();
-    }, [pin]);
     
     // Delete batch
     // delete students related to this batch

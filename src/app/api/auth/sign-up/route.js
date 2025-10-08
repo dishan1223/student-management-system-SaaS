@@ -38,9 +38,9 @@ export async function POST(req) {
 
     // Generate token
     const token = jwt.sign(
-      { userId: newUser.insertedId },
+      { userId: newUser.insertedId, plan: "Free" },
       process.env.JWT_SECRET,
-      { expiresIn: "30d" }
+      { expiresIn: "90d" }
     );
 
     // Set cookie
@@ -51,7 +51,7 @@ export async function POST(req) {
 
     response.cookies.set("token", token, {
       httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60, // 30 days
+      maxAge: 90 * 24 * 60 * 60, // 90 days
       sameSite: "strict",
       path: "/",
     });

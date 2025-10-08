@@ -10,10 +10,10 @@ import {
   AlertTriangle
 } from "lucide-react";
 
-import useRequirePin from "@/utils/useRequirePin";
+
 
 export default function AddStudentPage() {
-  useRequirePin();
+
 
   const formRef = useRef(null);
   const [loading, setLoading] = useState(false);

@@ -2,8 +2,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import StudentCard from "@/components/studentCard";
+import useRequirePaid from "@/utils/requireAuth";
 
 export default function BatchStudentsPage() {
+  useRequirePaid()
+
   const { id } = useParams(); // batch _id from slug
   const [students, setStudents] = useState([]);
   const [batch, setBatch] = useState(null);

@@ -3,11 +3,10 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Clock, GraduationCap, BookOpen, DollarSign, Calendar } from "lucide-react";
-import useRequirePin from "@/utils/useRequirePin";
+import useRequirePaid from "@/utils/requireAuth";
 
-export default function CreateBatch() {
-    useRequirePin();
-
+export default function CreateBatch() {;
+    useRequirePaid();
     const formRef = useRef(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");

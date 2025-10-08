@@ -4,11 +4,11 @@ import Search from "@/components/Search.jsx";
 import { useEffect, useState } from "react";
 import { Users, Filter, Search as SearchIcon, AlertCircle } from "lucide-react";
 
-import useRequirePin from "@/utils/useRequirePin";
+
 
 export default function Students() {
 
-    useRequirePin();
+
     
   const [students, setStudents] = useState([]);
   const [results, setResults] = useState([]); // search results

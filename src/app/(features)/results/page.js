@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 
-import useRequirePin from "@/utils/useRequirePin";
+
 
 export default function ResultsPage() {
-    useRequirePin();
+
 
   const [students, setStudents] = useState([]);
   const [filtered, setFiltered] = useState([]);
