@@ -1,13 +1,13 @@
+
 'use client'
 
-import { useSearchParams, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import Navbar from "@/components/Navbar"
 import { CheckCircle2, XCircle } from "lucide-react"
 
 export default function PaymentPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const success = searchParams.get("status") === "true"  // success=true → payment success
+  const success = true // manually toggle between true or false
 
   return (
     <div className="min-h-screen bg-white text-gray-800 flex flex-col">
