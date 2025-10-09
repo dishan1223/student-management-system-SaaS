@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import jwt_decode from 'jwt-decode';
+import jwt from 'jsonwebtoken';
 
 export default function useRequirePaid(){
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function useRequirePaid(){
     }
 
     try {
-      const decoded = jwt_decode(token);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
       if (decoded.plan !== "Pro" || decoded.plan !=="Basic" || decoded.plan !=="Enterprise") {
         router.push("/upgrade")
       }
