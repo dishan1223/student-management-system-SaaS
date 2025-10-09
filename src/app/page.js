@@ -134,12 +134,18 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-20">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-gray-900 to-gray-700 rounded-2xl flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
+                <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
                   <GraduationCap className="w-7 h-7 text-white" />
                 </div>
                 <span className="text-2xl font-bold text-gray-900">Loom Softwares</span>
               </div>
               <div className="flex items-center gap-3">
+                <a
+                  href="/upgrade"
+                  className="px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 hover:shadow-lg transition-all font-semibold"
+                >
+                  Purchase
+                </a>
                 <button
                   onClick={handleLogout}
                   className="px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all font-semibold border-2 border-gray-200 hover:border-gray-300"
@@ -269,7 +275,7 @@ export default function HomePage() {
             <span className="text-gray-700 text-sm font-semibold">Next Generation Management</span>
           </div>
           
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-8 text-gray-900">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-8 text-[#0149f9">
             Modern Coaching Center
             <span className="block mt-3 bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
               Management System
@@ -319,7 +325,7 @@ export default function HomePage() {
         </div>
 
         {/* Pricing Section */}
-        <div className="mb-24">
+        <div id="pricing" className="mb-24">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
               Simple, Transparent Pricing
@@ -361,7 +367,7 @@ export default function HomePage() {
                   ))}
                 </ul>
                 <a 
-                  href="/sign-up" 
+                  href="/upgrade" 
                   className={`block w-full py-4 rounded-2xl font-bold text-center transition-all transform hover:scale-105 ${
                     plan.popular 
                       ? 'bg-gray-900 text-white hover:bg-gray-800 shadow-lg' 

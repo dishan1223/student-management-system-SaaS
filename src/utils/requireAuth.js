@@ -20,7 +20,7 @@ export default function useRequirePaid(){
 
     try {
       const decoded = jwt_decode(token);
-      if (decoded.plan !== "Paid") {
+      if (decoded.plan !== "Pro" || decoded.plan !=="Basic" || decoded.plan !=="Enterprise") {
         router.push("/upgrade")
       }
     } catch (error) {
