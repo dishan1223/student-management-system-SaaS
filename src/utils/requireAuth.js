@@ -2,29 +2,37 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import jwt from 'jsonwebtoken';
 
-export default function useRequirePaid(){
-  const router = useRouter();
+export default function useRequirePaid() {
+  const router = useRouter()
 
-  useEffect(()=>{
-    const token = document.cookie
-    .split('; ')
-    .find(row => row.startsWith("token="))
-    ?.split("=")[1];
+  useEffect(() => {
+    async function verifyUser() {
+      try {
+        const res = await fetch("/api/auth/planCheck", { cache: "no-store" })
+        const data = await res.json()
 
-    if(!token){
-      router.push("/")
-      return
-    }
-
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      if (decoded.plan !== "Pro" || decoded.plan !=="Basic" || decoded.plan !=="Enterprise") {
-        router.push("/upgrade")
+        if (!data.success) {
+          switch (data.reason) {
+            case "notLoggedIn":
+              router.push("/")
+              break
+            case "noPlan":
+              router.push("/upgrade")
+              break
+            case "expired":
+              router.push("/upgrade?status=expired")
+              break
+            default:
+              router.push("/")
+          }
+        }
+      } catch (err) {
+        console.error("Auth check failed:", err)
+        router.push("/")
       }
-    } catch (error) {
-      router.push("/")
     }
+
+    verifyUser()
   }, [router])
 }
