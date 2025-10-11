@@ -27,28 +27,32 @@ if (process.env.NODE_ENV === "development") {
 }
 
 
-const token = cookies().get("token")?.value;
-if(!token) {
-  return NextResponse.json({error : "failed to load token"}, {status : 401})
-}
 
-const decoded = jwt.verify(token, process.env.JWT_SECRET)
-if(!decoded) {
-  return NextResponse.json({error : "failed to load token"}, {status : 401})
-}
-const userId = decoded.userId
-if(!userId) {
-  return NextResponse.json({error : "failed to load token"}, {status : 401})
-}
 
 
 export async function GET(req) {
+
+  const token = cookies().get("token")?.value;
+  if(!token) {
+    return NextResponse.json({error : "failed to load token"}, {status : 401})
+  }
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET)
+  if(!decoded) {
+    return NextResponse.json({error : "failed to load token"}, {status : 401})
+  }
+  const userId = decoded.userId
+  if(!userId) {
+    return NextResponse.json({error : "failed to load token"}, {status : 401})
+  }
+
+  
   const client = await clientPromise;
   const db = client.db(dbName);
   const collection = db.collection("students");
 
   // 1️⃣ Fetch all students
-  const students = await collection.find({createdBy : new ObjectId(userId)}).toArray();
+  const students = await collection.find({createdBy : new ObjectId(user)}).toArray();
 
   // 2️⃣ Group students by batch
   const batchMap = {};
