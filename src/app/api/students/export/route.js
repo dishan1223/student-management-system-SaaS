@@ -32,7 +32,7 @@ if (process.env.NODE_ENV === "development") {
 
 export async function GET(req) {
 
-  const token = cookies().get("token")?.value;
+  const token = await cookies().get("token")?.value;
   if(!token) {
     return NextResponse.json({error : "failed to load token"}, {status : 401})
   }
@@ -46,7 +46,7 @@ export async function GET(req) {
     return NextResponse.json({error : "failed to load token"}, {status : 401})
   }
 
-  
+
   const client = await clientPromise;
   const db = client.db(dbName);
   const collection = db.collection("students");

@@ -4,30 +4,24 @@ import Search from "@/components/Search.jsx";
 import { useEffect, useState } from "react";
 import { Users, Filter, Search as SearchIcon, AlertCircle } from "lucide-react";
 
-
-
 export default function Students() {
-
-
-    
   const [students, setStudents] = useState([]);
   const [results, setResults] = useState([]); // search results
+  const [batches, setBatches] = useState([]); // batch list from API
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedBatch, setSelectedBatch] = useState("");
   const [selectedStudyDays, setSelectedStudyDays] = useState("");
 
+  // fetch students
   useEffect(() => {
     async function fetchStudents() {
       try {
         const res = await fetch(`/api/students`);
         if (!res.ok) throw new Error("Failed to fetch students");
-        
+
         const data = await res.json();
-        
-        // Handle null/undefined data and ensure we have an array
         const safeData = Array.isArray(data) ? data : (data ? [data] : []);
-        
         setStudents(safeData);
         setResults(safeData);
       } catch (err) {
@@ -42,18 +36,32 @@ export default function Students() {
     fetchStudents();
   }, []);
 
-  // Safe array operations with null checks
+  // fetch batches
+  useEffect(() => {
+    async function fetchBatches() {
+      try {
+        const res = await fetch("/api/batch/all");
+        if (!res.ok) throw new Error("Failed to fetch batches");
+        const data = await res.json();
+        setBatches(data || []);
+      } catch (err) {
+        console.error("Error fetching batches:", err);
+      }
+    }
+    fetchBatches();
+  }, []);
+
   const safeStudents = Array.isArray(students) ? students : [];
   const safeResults = Array.isArray(results) ? results : [];
-
-  const batchTimes = [...new Set(safeStudents.map((s) => s?.batch_time).filter(Boolean))];
   const studyDays = [...new Set(safeStudents.flatMap((s) => s?.study_days || []).filter(Boolean))];
 
+  // filter logic
   const filteredResults = safeResults.filter((student) => {
     if (!student) return false;
-    
-    const batchMatch = selectedBatch ? student.batch_time === selectedBatch : true;
+
+    const batchMatch = selectedBatch ? student.batch_id === selectedBatch : true;
     const studyDaysMatch = selectedStudyDays ? student.study_days?.includes(selectedStudyDays) : true;
+
     return batchMatch && studyDaysMatch;
   });
 
@@ -77,7 +85,7 @@ export default function Students() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
@@ -97,39 +105,26 @@ export default function Students() {
             <Filter className="w-5 h-5 text-gray-600" />
             <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Batch Filter (replacing batch time) */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Batch Time</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Batch</label>
               <select
                 value={selectedBatch}
                 onChange={(e) => setSelectedBatch(e.target.value)}
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
               >
-                <option value="">All Batch Times</option>
-                {batchTimes.map((batch) => (
-                  <option key={batch} value={batch}>
-                    {batch}
+                <option value="">All Batches</option>
+                {batches.map((batch) => (
+                  <option key={batch._id} value={batch._id}>
+                    {batch.name || batch.batch_name || "Unnamed Batch"}
                   </option>
                 ))}
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Study Days</label>
-              <select
-                value={selectedStudyDays}
-                onChange={(e) => setSelectedStudyDays(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              >
-                <option value="">All Study Days</option>
-                {studyDays.map((day) => (
-                  <option key={day} value={day}>
-                    {day}
-                  </option>
-                ))}
-              </select>
-            </div>
+            
           </div>
         </div>
 
@@ -144,7 +139,6 @@ export default function Students() {
 
         {/* Students List */}
         <div className="space-y-4">
-          {/* Loading State */}
           {loading && (
             <div className="space-y-4">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -153,7 +147,6 @@ export default function Students() {
             </div>
           )}
 
-          {/* Error State */}
           {error && (
             <div className="bg-white rounded-2xl shadow-sm border border-red-200 p-8 text-center">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -170,7 +163,6 @@ export default function Students() {
             </div>
           )}
 
-          {/* Empty State */}
           {!loading && !error && filteredResults.length === 0 && safeStudents.length > 0 && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -191,7 +183,6 @@ export default function Students() {
             </div>
           )}
 
-          {/* No Data State */}
           {!loading && !error && safeStudents.length === 0 && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -209,7 +200,6 @@ export default function Students() {
             </div>
           )}
 
-          {/* Students List */}
           {!loading && !error && filteredResults.length > 0 && (
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-4">
@@ -217,26 +207,25 @@ export default function Students() {
                   Showing {filteredResults.length} of {safeStudents.length} students
                 </p>
               </div>
-              
-              {filteredResults.map((student) => (
-                student && (
-                  <StudentCard
-                    key={student.id || student._id}
-                    id={student.id || student._id}
-                    name={student.name}
-                    batchTime={student.batch_time}
-                    className={student.class}
-                    phone={student.phone_number}
-                    subject={student.subject}
-                    paid={student.payment_status}
-                    amount={student.payment_amount}
-                  />
-                )
-              ))}
+
+              {filteredResults.map(
+                (student) =>
+                  student && (
+                    <StudentCard
+                      key={student.id || student._id}
+                      id={student.id || student._id}
+                      name={student.name}
+                      className={student.class}
+                      phone={student.phone_number}
+                      subject={student.subject}
+                      paid={student.payment_status}
+                      amount={student.payment_amount}
+                    />
+                  )
+              )}
             </div>
           )}
         </div>
-
       </div>
     </div>
   );
