@@ -4,66 +4,64 @@ import { useRouter } from "next/navigation";
 import { Trash2, Clock, BookOpen, GraduationCap, DollarSign } from "lucide-react";
 import useRequirePaid from "@/utils/requireAuth";
 
-
-
-
 export default function Batches() {
     useRequirePaid()
 
-    const [pin, setPin] = useState(null);
     const [batches, setBatches] = useState([]);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
-    
-    // Delete batch
-    // delete students related to this batch
-    async function DeleteRelatedStudents(id){
+    // Fetch all batches created by the logged-in user
+    useEffect(() => {
+        async function fetchBatches() {
+            try {
+                const res = await fetch("/api/batch/all");
+                if (!res.ok) throw new Error("Failed to fetch batches");
+                const data = await res.json();
+                setBatches(Array.isArray(data) ? data : []);
+            } catch (err) {
+                console.error(err);
+                setBatches([]);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchBatches();
+    }, []);
+
+    // Delete batch and related students
+    async function DeleteRelatedStudents(id) {
         try {
-            const res = await fetch(`/api/students`)
+            const res = await fetch(`/api/students`);
             if (!res.ok) throw new Error("Failed to fetch students");
             const data = await res.json();
-
-
             const filteredData = data.filter((s) => s.batch_id === id);
-            // delete these students one by one with a loop
-            for (let i = 0; i < filteredData.length; i++){
-                const res = await fetch(`/api/students/${filteredData[i]._id}/delete`, {
-                    method: "DELETE",
-                });
-                if (!res.ok) {
-                    throw new Error(data.error || "Failed to delete student");
-                }
-            }
-            
-        } catch (error) {
-            console.log(error)
-        }
-    };
 
+            for (let student of filteredData) {
+                const delRes = await fetch(`/api/students/${student._id}/delete`, { method: "DELETE" });
+                if (!delRes.ok) throw new Error("Failed to delete student");
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     async function handleDelete(id) {
         if (!confirm("Deleting this batch will also delete every student related to this batch.\nAre you sure?")) return;
 
-        
-
         try {
             await DeleteRelatedStudents(id);
-            const res = await fetch(`/api/batch/delete/${id}`, {
-                method: "DELETE", 
-            })
+            const res = await fetch(`/api/batch/delete/${id}`, { method: "DELETE" });
             if (!res.ok) throw new Error("Failed to delete batch");
             const data = await res.json();
             setBatches(batches.filter((b) => b._id !== id));
             alert(data.message);
-            console.log(data)
         } catch (err) {
             console.error("Failed to delete batch:", err);
             alert(`Failed to delete batch: ${err.message}`);
         }
     }
 
-    // Loading UI
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -75,7 +73,6 @@ export default function Batches() {
         );
     }
 
-    // No batches UI
     if (batches.length === 0) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -90,7 +87,6 @@ export default function Batches() {
         );
     }
 
-    // Main UI
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

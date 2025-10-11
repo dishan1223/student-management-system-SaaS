@@ -26,7 +26,13 @@ export default function AddStudentPage() {
   useEffect(() => {
     const fetchBatches = async () => {
       try {
-        const res = await fetch("/api/batch");
+        const res = await fetch("/api/batch/all", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", 
+        });
         if (res.ok) {
           const data = await res.json();
           setBatches(data);

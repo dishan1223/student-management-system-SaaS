@@ -56,7 +56,7 @@ export default function StudentDetails() {
   useEffect(() => {
     async function fetchBatch() {
       try {
-        const res = await fetch("/api/batch");
+        const res = await fetch("/api/batch/all");
         if (!res.ok) throw new Error("Failed to fetch batches");
         const data = await res.json();
 

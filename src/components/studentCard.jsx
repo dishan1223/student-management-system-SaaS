@@ -18,7 +18,6 @@ export default function StudentCard({
   const [deleted, setDeleted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const visibilityHidden = process.env.NEXT_PUBLIC_TUITION ? "hidden" : "";
 
   const handleStatusClick = async () => {
     if (!window.confirm("Are you sure you want to change payment status?")) return;
@@ -113,7 +112,7 @@ export default function StudentCard({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           
           {/* Class */}
-          <div className={`${visibilityHidden} flex items-center gap-2`}>
+          <div className={`flex items-center gap-2`}>
             <div className="w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center">
               <GraduationCap className="w-3 h-3 text-purple-600" />
             </div>
@@ -124,7 +123,7 @@ export default function StudentCard({
           </div>
 
           {/* Subject */}
-          <div className={`${visibilityHidden} flex items-center gap-2`}>
+          <div className={` flex items-center gap-2`}>
             <div className="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
               <BookOpen className="w-3 h-3 text-green-600" />
             </div>

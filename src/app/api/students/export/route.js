@@ -1,7 +1,9 @@
 // src/app/api/students/export/route.js
 import { NextResponse } from "next/server";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import ExcelJS from "exceljs";
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
 
 // MongoDB setup
 const uri = process.env.MONGODB_URI;
@@ -24,13 +26,29 @@ if (process.env.NODE_ENV === "development") {
   clientPromise = client.connect();
 }
 
+
+const token = cookies().get("token")?.value;
+if(!token) {
+  return NextResponse.json({error : "failed to load token"}, {status : 401})
+}
+
+const decoded = jwt.verify(token, process.env.JWT_SECRET)
+if(!decoded) {
+  return NextResponse.json({error : "failed to load token"}, {status : 401})
+}
+const userId = decoded.userId
+if(!userId) {
+  return NextResponse.json({error : "failed to load token"}, {status : 401})
+}
+
+
 export async function GET(req) {
   const client = await clientPromise;
   const db = client.db(dbName);
   const collection = db.collection("students");
 
   // 1️⃣ Fetch all students
-  const students = await collection.find({}).toArray();
+  const students = await collection.find({createdBy : new ObjectId(userId)}).toArray();
 
   // 2️⃣ Group students by batch
   const batchMap = {};

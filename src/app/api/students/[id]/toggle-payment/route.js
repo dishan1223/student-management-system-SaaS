@@ -1,4 +1,3 @@
-// src/app/api/students/[id]/toggle-payment/route.js
 import { MongoClient, ObjectId } from "mongodb";
 import clientPromise from "@/lib/mongodb";
 
@@ -19,7 +18,12 @@ export async function PATCH(req, { params }) {
       return new Response(JSON.stringify({ error: "Student not found" }), { status: 404 });
     }
 
-    const currentMonth = new Date().toLocaleString("default", { month: "long" });
+    // Get current date in dd-mm-yy
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, "0");
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const year = String(now.getFullYear()).slice(-2);
+    const paymentDate = `${day}-${month}-${year}`;
 
     let updatedPaidMonths = student.paid_months || [];
     let updatedDueMonths = student.due_months || [];
@@ -27,13 +31,12 @@ export async function PATCH(req, { params }) {
 
     if (newPaymentStatus) {
       // Unpaid → Paid
-      if (!updatedPaidMonths.includes(currentMonth)) {
-        updatedPaidMonths.push(currentMonth);
+      if (!updatedPaidMonths.includes(paymentDate)) {
+        updatedPaidMonths.push(paymentDate);
       }
-      updatedDueMonths = updatedDueMonths.filter((m) => m !== currentMonth);
+      updatedDueMonths = updatedDueMonths.filter((m) => m !== paymentDate);
 
-      // Optional: you can log notification
-      console.log(`Payment received for ${student.name} for ${currentMonth}`);
+      console.log(`Payment received for ${student.name} on ${paymentDate}`);
     }
 
     const updateResult = await collection.updateOne(
@@ -55,4 +58,3 @@ export async function PATCH(req, { params }) {
     return new Response(JSON.stringify({ error: "Failed to update student" }), { status: 500 });
   }
 }
-

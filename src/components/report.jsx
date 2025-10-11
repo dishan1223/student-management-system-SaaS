@@ -14,6 +14,10 @@ export default function DownloadButton() {
         method: "GET",
       });
 
+      if (res.status === 401){
+        alert("login to download report");
+      }
+
       if (!res.ok) throw new Error("Failed to download file");
 
       const blob = await res.blob();

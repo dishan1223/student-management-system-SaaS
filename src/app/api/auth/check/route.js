@@ -1,11 +1,14 @@
-// /app/api/auth/check/route.js
+import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 
-export async function GET(req) {
+export async function GET() {
   try {
-    const token = req.cookies.get("token")?.value;
+
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value; // ✅ use cookies() instead of req.cookies
+
     if (!token) return Response.json({ loggedIn: false });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -20,6 +23,7 @@ export async function GET(req) {
       user: { id: user._id, name: user.name, email: user.email, plan: user.plan },
     });
   } catch (err) {
+    console.error("Error verifying token:", err);
     return Response.json({ loggedIn: false });
   }
 }

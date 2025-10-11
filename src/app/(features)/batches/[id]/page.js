@@ -16,7 +16,7 @@ export default function BatchStudentsPage() {
   useEffect(() => {
     async function fetchBatch() {
       try {
-        const res = await fetch("/api/batch");
+        const res = await fetch("/api/batch/all");
         if (!res.ok) throw new Error("Failed to fetch batches");
         const data = await res.json();
 
@@ -72,7 +72,7 @@ export default function BatchStudentsPage() {
               className={batch?.class || ""}
               subject={batch?.subject || ""}
               paid={student.payment_status || false}
-              amount={batch?.payment_amount || null}
+              amount={null}
               onDeleteSuccess={() =>
                 setStudents((prev) => prev.filter((s) => s._id !== student._id))
               }

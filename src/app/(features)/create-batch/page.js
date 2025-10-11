@@ -47,7 +47,7 @@ export default function CreateBatch() {;
 
             if (!res.ok) throw new Error("Failed to create batch");
 
-            router.push("/"); // redirect to batch list or wherever you want
+            router.push("/dashboard"); // redirect to batch list or wherever you want
         } catch (err) {
             setError(err.message);
         } finally {
