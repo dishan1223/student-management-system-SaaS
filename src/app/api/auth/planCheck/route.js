@@ -18,7 +18,7 @@ export async function GET(req) {
       return Response.json({ success: false, reason: "notLoggedIn" });
     }
 
-    const allowedPlans = ["Basic", "Pro", "Enterprise"];
+    const allowedPlans = ["Basic", "Pro", "Enterprise", "Free", "Free Trial"];
     const now = new Date();
 
     // Check for valid plan

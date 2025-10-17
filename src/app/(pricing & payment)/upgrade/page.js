@@ -7,7 +7,7 @@ import { CheckCircle2 } from "lucide-react";
 export default function UpgradePlan() {
   const plans = [
   {
-      id: "Basic",
+      id: "Free",
       name: "Free Trial",
       validity: "2",
       price: "Free / 2 month",
