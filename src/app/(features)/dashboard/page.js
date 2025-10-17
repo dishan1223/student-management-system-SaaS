@@ -53,6 +53,13 @@ function ModernDummyButton({ title, icon: Icon }) {
   );
 }
 
+function formatBDT(amount){
+  if(isNaN(Number(amount))) return amount;
+
+  return Number(amount).toLocaleString("en-IN"); 
+}
+
+
 export default function Home() {
 
 
@@ -206,7 +213,7 @@ export default function Home() {
                 <DollarSign className="w-5 h-5 text-yellow-600" />
               </div>
               <span className="text-xl sm:text-2xl font-bold text-gray-900">
-                {loading ? "..." : `৳${totalPaidAmount}`}
+                {loading ? "..." : `৳${formatBDT(totalPaidAmount)}`}
               </span>
             </div>
             <p className="text-sm font-medium text-gray-600">Total Collected</p>

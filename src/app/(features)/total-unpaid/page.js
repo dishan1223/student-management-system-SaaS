@@ -62,7 +62,7 @@ export default function TotalUnpaidPage() {
 
         // Ensure array and filter safely
         if (!Array.isArray(data)) data = [];
-        const unpaidStudents = data.filter((s) => s && s.payment_status === false);
+        const unpaidStudents = data.filter((s) => s && s.payment_status !== true);
         setStudents(unpaidStudents);
       } catch (err) {
         console.error("Error fetching students:", err);
@@ -137,11 +137,7 @@ export default function TotalUnpaidPage() {
     return matchDay && matchBatch;
   });
 
-  const studyDayLabels = {
-    "smw": "Saturday, Monday, Wednesday",
-    "stt": "Sunday, Tuesday, Thursday", 
-    "regular": "Regular"
-  };
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -180,48 +176,7 @@ export default function TotalUnpaidPage() {
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Filter className="w-5 h-5 text-gray-600" />
-            <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Study Days</label>
-              <select
-                value={selectedStudyDay}
-                onChange={(e) => setSelectedStudyDay(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
-              >
-                <option value="">All Study Days</option>
-                {studyDays.map((day) => (
-                  <option key={day} value={day}>
-                    {studyDayLabels[day] || day}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Batch Time</label>
-              <select
-                value={selectedBatch}
-                onChange={(e) => setSelectedBatch(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
-              >
-                <option value="">All Batch Times</option>
-                {batchTimes.map((batch) => (
-                  <option key={batch} value={batch}>
-                    {batch}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
+       
         {/* Students List */}
         {filteredStudents.length === 0 && students.length > 0 ? (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">

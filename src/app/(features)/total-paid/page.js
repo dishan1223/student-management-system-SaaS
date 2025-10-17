@@ -136,12 +136,7 @@ export default function TotalPaidPage() {
     return matchDay && matchBatch;
   });
 
-  const studyDayLabels = {
-    "smw": "Saturday, Monday, Wednesday",
-    "stt": "Sunday, Tuesday, Thursday", 
-    "regular": "Regular"
-  };
-
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -179,47 +174,7 @@ export default function TotalPaidPage() {
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Filter className="w-5 h-5 text-gray-600" />
-            <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Study Days</label>
-              <select
-                value={selectedStudyDay}
-                onChange={(e) => setSelectedStudyDay(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
-              >
-                <option value="">All Study Days</option>
-                {studyDays.map((day) => (
-                  <option key={day} value={day}>
-                    {studyDayLabels[day] || day}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Batch Time</label>
-              <select
-                value={selectedBatch}
-                onChange={(e) => setSelectedBatch(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
-              >
-                <option value="">All Batch Times</option>
-                {batchTimes.map((batch) => (
-                  <option key={batch} value={batch}>
-                    {batch}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
+        
 
         {/* Students List */}
         {filteredStudents.length === 0 && students.length > 0 ? (

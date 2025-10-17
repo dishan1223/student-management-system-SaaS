@@ -10,16 +10,13 @@ import {
   AlertTriangle
 } from "lucide-react";
 
-
-
 export default function AddStudentPage() {
-
-
   const formRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [batches, setBatches] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState(null);
+  const [selectedDueMonths, setSelectedDueMonths] = useState([]);
   const router = useRouter();
 
   // fetch batches for dropdown
@@ -50,11 +47,19 @@ export default function AddStudentPage() {
     setSelectedBatch(batch);
   };
 
+  const handleDueMonthChange = (month) => {
+    setSelectedDueMonths((prev) =>
+      prev.includes(month)
+        ? prev.filter((m) => m !== month)
+        : [...prev, month]
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-    // get todays date when a student is added
+
     const today = new Date();
     const year = today.getFullYear();
     const month = (today.getMonth() + 1).toString().padStart(2, '0');
@@ -81,8 +86,9 @@ export default function AddStudentPage() {
           name,
           phone_number,
           batch_id,
-          payment_amount: selectedBatch.payment_amount, // automatically from batch
+          payment_amount: selectedBatch.payment_amount,
           admission_date: formattedDate,
+          due_months: selectedDueMonths, // optional field
         }),
       });
       if (res.ok) {
@@ -180,6 +186,43 @@ export default function AddStudentPage() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* Previous Due Months (Optional) */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-4">
+                <div className="w-5 h-5 bg-indigo-100 rounded flex items-center justify-center">
+                  <GraduationCap className="w-3 h-3 text-indigo-600" />
+                </div>
+                Previous Due Months (Optional)
+              </label>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {[
+                  "January", "February", "March", "April", "May", "June",
+                  "July", "August", "September", "October", "November", "December"
+                ].map((month) => (
+                  <label
+                    key={month}
+                    className={`relative flex items-center justify-center px-4 py-3 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                      selectedDueMonths.includes(month)
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedDueMonths.includes(month)}
+                      onChange={() => handleDueMonthChange(month)}
+                      className="sr-only"
+                    />
+                    <span className="text-sm font-medium">{month}</span>
+                    {selectedDueMonths.includes(month) && (
+                      <div className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full"></div>
+                    )}
+                  </label>
+                ))}
+              </div>
             </div>
 
             {/* Error Message */}
