@@ -1,5 +1,120 @@
+'use client'
+import { useEffect, useState } from "react";
+import { Users, CreditCard, BarChart3, MessageSquare, Bell, GraduationCap, CheckCircle, ArrowRight, Menu, X, Info } from "lucide-react";
+
+const CONFIG = {
+  branding: {
+    name: "EduFlow",
+    logo: "/logo.png", // Change to your logo image path, or set to null to use icon + text
+    useTextLogo: true, // Set to false if you want to use an image logo
+    tagline: "Manage coaching easily.",
+    description: "Focus on teaching while EduFlow takes care of the management."
+  },
+  hero: {
+    title: "EduFlow - Manage coaching",
+    highlightedWord: "easily",
+    subtitle: "Focus on teaching while EduFlow takes care of the management.",
+    features: [
+      "Student Management",
+      "Payment Tracking",
+      "Batch Tracking",
+      "Exam results and payments via SMS"
+    ]
+  },
+  features: {
+    sectionTitle: "Everything you need",
+    sectionSubtitle: "Powerful features designed to make coaching management easier",
+    items: [
+      {
+        icon: Users,
+        title: "Student Management",
+        description: "Efficiently manage student records and enrollment intelligent automation"
+      },
+      {
+        icon: CreditCard,
+        title: "Payment Management",
+        description: "Seamless fee tracking with automated SMS notifications and instant payment confirmations"
+      },
+      {
+        icon: BarChart3,
+        title: "Result Dashboard",
+        description: "Publish results with instant sms."
+      },
+      {
+        icon: GraduationCap,
+        title: "Batch Management",
+        description: "Organize multiple batches and its students with ease"
+      },
+      {
+        icon: MessageSquare,
+        title: "Student Portal",
+        description: "Comprehensive self-service portal for notes, marks, and real-time updates"
+      },
+      {
+        icon: Bell,
+        title: "Notice Board",
+        description: "Dynamic announcement system with push notifications and priority alerts"
+      }
+    ]
+  },
+  pricing: {
+    sectionTitle: "Simple Pricing",
+    sectionSubtitle: "Choose the perfect plan for your coaching center",
+    plans: [
+      {
+        name: "Monthly",
+        price: "2,000",
+        duration: "month",
+        features: [
+          "Student Management",
+          "Payment Tracking",
+          "Result Dashboard",
+          "SMS Notifications",
+          "Student Portal",
+          "Notice Board"
+        ]
+      },
+      {
+        name: "Quarterly",
+        price: "5,000",
+        duration: "3 months",
+        popular: true,
+        features: [
+          "All Monthly Features",
+          "Priority Support",
+          "Advanced Analytics",
+          "Bulk SMS Credits",
+          "Data Export",
+          "Custom Reports"
+        ]
+      },
+      {
+        name: "Enterprise",
+        price: "Custom",
+        duration: "custom",
+        features: [
+          "All Quarterly Features",
+          "Unlimited Students",
+          "Dedicated Support",
+          "Custom Integrations",
+          "Advanced Security",
+          "Training & Onboarding"
+        ]
+      }
+    ]
+  },
+  footer: {
+    companyName: "Loom Softwares",
+    links: [
+      { text: "Privacy Policy", href: "#" },
+      { text: "Terms of Service", href: "#" },
+      { text: "Contact", href: "#" }
+    ]
+  }
+};
+
 // Navbar Component
-function Navbar({ isLoggedIn = false, onLogout = null }) {
+export default function Navbar({ isLoggedIn = false, onLogout = null }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -44,7 +159,7 @@ function Navbar({ isLoggedIn = false, onLogout = null }) {
             </div>
           ) : (
             <div className="hidden md:flex items-center gap-8">
-              <a href="#home" className="text-gray-700 hover:text-gray-900 font-medium">HOME</a>
+              <a href="/" className="text-gray-700 hover:text-gray-900 font-medium">HOME</a>
               <a href="#pricing" className="text-gray-700 hover:text-gray-900 font-medium">PRICING</a>
               <a href="#about" className="text-gray-700 hover:text-gray-900 font-medium">ABOUT US</a>
               <a href="/sign-in" className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium border border-gray-300 rounded-lg">
@@ -84,7 +199,7 @@ function Navbar({ isLoggedIn = false, onLogout = null }) {
               </>
             ) : (
               <>
-                <a href="#home" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">HOME</a>
+                <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">HOME</a>
                 <a href="#pricing" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">PRICING</a>
                 <a href="#about" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">ABOUT US</a>
                 <a href="/sign-in" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg border border-gray-300">
