@@ -258,9 +258,9 @@ export default function HomePage() {
             </div>
             
             <div className="hidden md:flex items-center gap-8">
-              <a href="#home" className="text-gray-700 hover:text-gray-900 font-medium">HOME</a>
+              <a href="/" className="text-gray-700 hover:text-gray-900 font-medium">HOME</a>
               <a href="#pricing" className="text-gray-700 hover:text-gray-900 font-medium">PRICING</a>
-              <a href="#about" className="text-gray-700 hover:text-gray-900 font-medium">ABOUT US</a>
+              <a href="/about" className="text-gray-700 hover:text-gray-900 font-medium">ABOUT US</a>
               <a href="/sign-in" className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium border border-gray-300 rounded-lg">
                 Login
               </a>
@@ -282,9 +282,9 @@ export default function HomePage() {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 bg-white">
             <div className="px-4 py-3 space-y-2">
-              <a href="#home" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">HOME</a>
+              <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">HOME</a>
               <a href="#pricing" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">PRICING</a>
-              <a href="#about" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">ABOUT US</a>
+              <a href="/about" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">ABOUT US</a>
               <a href="/sign-in" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg border border-gray-300">
                 Login
               </a>
