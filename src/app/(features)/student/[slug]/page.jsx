@@ -32,7 +32,8 @@ export default function StudentDetails() {
   // batch related informations
   const [batchID, setBatchID] = useState(null);
   const [batch, setBatch] = useState([]);
-  const [studyDays, setStudyDays] = useState("")
+  const [studyDays, setStudyDays] = useState("");
+  const [allBatches, setAllBatches] = useState([]); // all batches for dropdown
 
   const visibilityHidden = process.env.NEXT_PUBLIC_TUITION ? "hidden" : "";
 
@@ -42,7 +43,7 @@ export default function StudentDetails() {
         const res = await fetch(`/api/student/${slug}`);
         const data = await res.json();
         setStudent(data);
-        setBatchID(data.batch_id)
+        setBatchID(data.batch_id);
       } catch (error) {
         console.error("Error fetching student:", error);
       } finally {
@@ -59,12 +60,14 @@ export default function StudentDetails() {
         const res = await fetch("/api/batch/all");
         if (!res.ok) throw new Error("Failed to fetch batches");
         const data = await res.json();
+        setAllBatches(data);
 
         const foundBatch = data.find((b) => b._id === batchID);
         setBatch(foundBatch);
-        console.log(foundBatch)
-        const studyDays = foundBatch.days.join(", ");
-        setStudyDays(studyDays);
+        if (foundBatch?.days) {
+          const studyDays = foundBatch.days.join(", ");
+          setStudyDays(studyDays);
+        }
       } catch (error) {
         console.error("Error fetching batch:", error);
       }
@@ -73,23 +76,32 @@ export default function StudentDetails() {
     if (batchID) fetchBatch();
   }, [batchID]);
 
-  //const studyDays = foundBatch.days.join(", ")
-
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    // if batch_id changes, auto-update payment_amount
+    if (name === "batch_id") {
+      const selected = allBatches.find((b) => b._id === value);
+      setFormData({
+        ...formData,
+        [name]: value,
+        payment_amount: selected ? selected.payment_amount : formData.payment_amount,
+      });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setUpdating(true);
 
-    // remove empty fields so they don't overwrite with ""
     const filteredData = Object.fromEntries(
       Object.entries(formData).filter(([_, v]) => v !== "")
     );
 
-    // Convert class to int and payment_amount to float
-    if (filteredData.payment_amount) filteredData.payment_amount = parseFloat(filteredData.payment_amount);
+    if (filteredData.payment_amount)
+      filteredData.payment_amount = parseFloat(filteredData.payment_amount);
 
     try {
       const res = await fetch(`/api/student/edit/${slug}`, {
@@ -101,14 +113,14 @@ export default function StudentDetails() {
         alert("Student updated successfully");
         setShowForm(false);
         setFormData({});
-        setStudent({ ...student, ...filteredData }); // update UI
+        setStudent({ ...student, ...filteredData });
+        if (filteredData.batch_id) setBatchID(filteredData.batch_id);
       } else {
-        console.error("Update failed");
         alert("Update failed");
       }
     } catch (err) {
-      console.error("Error updating student:", err);
       alert("Error updating student");
+      console.error("Error updating student:", err);
     } finally {
       setUpdating(false);
     }
@@ -118,35 +130,26 @@ export default function StudentDetails() {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="space-y-6">
-            {/* Header Skeleton */}
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-            </div>
-            
-            {/* Cards Skeleton */}
+          <div className="space-y-6 animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                  <div className="animate-pulse space-y-4">
-                    <div className="h-6 bg-gray-200 rounded w-1/4"></div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {[...Array(6)].map((_, i) => (
-                        <div key={i} className="h-16 bg-gray-200 rounded-xl"></div>
-                      ))}
-                    </div>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+                  <div className="h-6 bg-gray-200 rounded w-1/4"></div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[...Array(6)].map((_, i) => (
+                      <div key={i} className="h-16 bg-gray-200 rounded-xl"></div>
+                    ))}
                   </div>
                 </div>
               </div>
               <div className="space-y-6">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                  <div className="animate-pulse space-y-4">
-                    <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-                    <div className="space-y-3">
-                      <div className="h-4 bg-gray-200 rounded w-full"></div>
-                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    </div>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+                  <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+                  <div className="space-y-3">
+                    <div className="h-4 bg-gray-200 rounded w-full"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                   </div>
                 </div>
               </div>
@@ -174,7 +177,7 @@ export default function StudentDetails() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
@@ -186,13 +189,11 @@ export default function StudentDetails() {
           <p className="text-gray-600">View and manage student information</p>
         </div>
 
-        {/* Main Content Grid */}
+        {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Left Column - Student Information */}
+          {/* Left Section */}
           <div className="lg:col-span-2 space-y-6">
-            
-            {/* Student Information Card */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
@@ -205,142 +206,29 @@ export default function StudentDetails() {
                     <span>Edit</span>
                   </button>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <ModernInfoCard 
-                    icon={<User className="w-4 h-4 text-purple-600" />}
-                    iconBg="bg-purple-100"
-                    label="Full Name" 
-                    value={student.name} 
-                  />
-                  <ModernInfoCard 
-                    icon={<Phone className="w-4 h-4 text-blue-600" />}
-                    iconBg="bg-blue-100"
-                    label="Phone Number" 
-                    value={student.phone_number} 
-                  />
-                  <ModernInfoCard 
-                    
-                    icon={<GraduationCap className="w-4 h-4 text-green-600" />}
-                    iconBg="bg-green-100"
-                    label="Class" 
-                    value={batch.class} 
-                  />
-                  <ModernInfoCard 
-                    icon={<Clock className="w-4 h-4 text-indigo-600" />}
-                    iconBg="bg-indigo-100"
-                    label="Batch Time" 
-                    value={batch.time} 
-                  />
-                  <ModernInfoCard 
-                    
-                    icon={<BookOpen className="w-4 h-4 text-orange-600" />}
-                    iconBg="bg-orange-100"
-                    label="Subject" 
-                    value={batch.subject} 
-                  />
-                  <ModernInfoCard 
-                    
-                    icon={<Handshake className="w-4 h-4 text-pink-600" />}
-                    iconBg="bg-pink-100"
-                    label="Admission Date" 
-                    value={student.admission_date} 
-                  />
-                  <ModernInfoCard 
-                    icon={<DollarSign className="w-4 h-4 text-emerald-600" />}
-                    iconBg="bg-emerald-100"
-                    label="Payment Amount" 
-                    value={`৳${student.payment_amount}`} 
-                  />
-                  <ModernInfoCard 
-                    icon={<Calendar className="w-4 h-4 text-pink-600" />}
-                    iconBg="bg-pink-100"
-                    label="Study Days" 
-                    value={studyDays}
-                    colSpan="md:col-span-2"
-                  />
+                  <ModernInfoCard icon={<User className="w-4 h-4 text-purple-600" />} iconBg="bg-purple-100" label="Full Name" value={student.name} />
+                  <ModernInfoCard icon={<Phone className="w-4 h-4 text-blue-600" />} iconBg="bg-blue-100" label="Phone Number" value={student.phone_number} />
+                  <ModernInfoCard icon={<GraduationCap className="w-4 h-4 text-green-600" />} iconBg="bg-green-100" label="Class" value={batch.class} />
+                  <ModernInfoCard icon={<Clock className="w-4 h-4 text-indigo-600" />} iconBg="bg-indigo-100" label="Batch" value={batch.batch_name} />
+                  <ModernInfoCard icon={<BookOpen className="w-4 h-4 text-orange-600" />} iconBg="bg-orange-100" label="Subject" value={batch.subject} />
+                  <ModernInfoCard icon={<Handshake className="w-4 h-4 text-pink-600" />} iconBg="bg-pink-100" label="Admission Date" value={student.admission_date} />
+                  <ModernInfoCard icon={<DollarSign className="w-4 h-4 text-emerald-600" />} iconBg="bg-emerald-100" label="Payment Amount" value={`৳${student.payment_amount}`} />
+                  <ModernInfoCard icon={<Calendar className="w-4 h-4 text-pink-600" />} iconBg="bg-pink-100" label="Study Days" value={studyDays} colSpan="md:col-span-2" />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column - Payment History */}
-          <div className="space-y-6">
-            
-            {/* Payment History Card */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <DollarSign className="w-4 h-4 text-green-600" />
-                  </div>
-                  <h2 className="text-xl font-semibold text-gray-900">Payment History</h2>
-                </div>
-                
-                <div className="space-y-6">
-                  {/* Paid Months */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-3">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
-                      <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Paid Months</h3>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {student.paid_months?.length > 0 ? (
-                        student.paid_months.map((month, idx) => (
-                          <span 
-                            key={idx} 
-                            className="inline-flex items-center gap-1 bg-green-50 text-green-700 text-xs font-medium px-3 py-1.5 rounded-full border border-green-200"
-                          >
-                            <CheckCircle className="w-3 h-3" />
-                            {month}
-                          </span>
-                        ))
-                      ) : (
-                        <div className="flex items-center gap-2 text-gray-500 text-sm bg-gray-50 px-3 py-2 rounded-xl">
-                          <XCircle className="w-4 h-4" />
-                          <span>No payments recorded</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Due Months */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-3">
-                      <XCircle className="w-4 h-4 text-red-600" />
-                      <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Due Months</h3>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {student.due_months?.length > 0 ? (
-                        student.due_months.map((month, idx) => (
-                          <span 
-                            key={idx} 
-                            className="inline-flex items-center gap-1 bg-red-50 text-red-700 text-xs font-medium px-3 py-1.5 rounded-full border border-red-200"
-                          >
-                            <XCircle className="w-3 h-3" />
-                            {month}
-                          </span>
-                        ))
-                      ) : (
-                        <div className="flex items-center gap-2 text-gray-500 text-sm bg-gray-50 px-3 py-2 rounded-xl">
-                          <CheckCircle className="w-4 h-4" />
-                          <span>No dues pending</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Right Section - Payment */}
+          <PaymentSection student={student} />
         </div>
 
-        {/* Edit Form Modal */}
+        {/* Edit Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl max-h-[90vh] overflow-y-auto">
-              
-              {/* Modal Header */}
               <div className="flex items-center justify-between p-6 border-b border-gray-100">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -356,141 +244,41 @@ export default function StudentDetails() {
                 </button>
               </div>
 
-              {/* Modal Content */}
               <form onSubmit={handleSubmit} className="p-6 space-y-5">
-                
-                {/* Form Fields */}
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                    <User className="w-4 h-4 text-purple-600" />
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Enter new name"
-                    onChange={handleChange}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  />
-                </div>
+                {/* Name */}
+                <InputField label="Name" icon={<User className="w-4 h-4 text-purple-600" />} name="name" placeholder="Enter new name" onChange={handleChange} />
 
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                    <Phone className="w-4 h-4 text-blue-600" />
-                    Phone Number
-                  </label>
-                  <input
-                    type="text"
-                    name="phone_number"
-                    placeholder="Enter new phone number"
-                    onChange={handleChange}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  />
-                </div>
+                {/* Phone */}
+                <InputField label="Phone Number" icon={<Phone className="w-4 h-4 text-blue-600" />} name="phone_number" placeholder="Enter new phone number" onChange={handleChange} />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                      <GraduationCap className="w-4 h-4 text-green-600" />
-                      Class
-                    </label>
-                    <input
-                      type="text"
-                      name="class"
-                      placeholder="Enter class"
-                      onChange={handleChange}
-                      pattern="\d*"
-                      inputMode="numeric"
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                      <Clock className="w-4 h-4 text-indigo-600" />
-                      Batch Time
-                    </label>
-                    <input
-                      type="text"
-                      name="batch_time"
-                      placeholder="Enter batch time"
-                      onChange={handleChange}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    />
-                  </div>
-                </div>
-
+                {/* Batch Dropdown */}
                 <div>
                   <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
                     <BookOpen className="w-4 h-4 text-orange-600" />
-                    Subject
-                  </label>
-                  <input
-                    type="text"
-                    name="subject"
-                    placeholder="Enter subject"
-                    onChange={handleChange}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  />
-                </div>
-
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                    <Calendar className="w-4 h-4 text-pink-600" />
-                    Study Days
+                    Batch
                   </label>
                   <select
-                    name="study_days"
+                    name="batch_id"
                     onChange={handleChange}
+                    defaultValue={student.batch_id}
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                   >
-                    <option value="">Select Study Days</option>
-                    <option value="smw">Saturday, Monday, Wednesday</option>
-                    <option value="stt">Sunday, Tuesday, Thursday</option>
-                    <option value="regular">Regular</option>
+                    <option value="">Select batch</option>
+                    {allBatches.map((b) => (
+                      <option key={b._id} value={b._id}>
+                        {b.batch_name} (৳{b.payment_amount})
+                      </option>
+                    ))}
                   </select>
                 </div>
 
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                    <DollarSign className="w-4 h-4 text-emerald-600" />
-                    Payment Amount
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="payment_amount"
-                    placeholder="Enter payment amount"
-                    onChange={handleChange}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  />
-                </div>
+                {/* Payment */}
+                <InputField label="Payment Amount" icon={<DollarSign className="w-4 h-4 text-emerald-600" />} name="payment_amount" type="number" step="0.01" value={formData.payment_amount || ""} onChange={handleChange} />
 
-                {/* Modal Actions */}
                 <div className="flex justify-end gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowForm(false)}
-                    className="px-4 py-2 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors duration-200"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={updating}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors duration-200"
-                  >
-                    {updating ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4" />
-                        Save Changes
-                      </>
-                    )}
+                  <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors duration-200">Cancel</button>
+                  <button type="submit" disabled={updating} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-blue-300 transition-colors duration-200">
+                    {updating ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Saving...</> : <><Save className="w-4 h-4" /> Save Changes</>}
                   </button>
                 </div>
               </form>
@@ -502,21 +290,80 @@ export default function StudentDetails() {
   );
 }
 
-function ModernInfoCard({ icon, iconBg, label, value, colSpan = "", visibility }) {
+function InputField({ label, icon, ...props }) {
   return (
-    <div className={`${visibility} bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-gray-200 transition-all duration-200 ${colSpan}`}>
+    <div>
+      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+        {icon} {label}
+      </label>
+      <input {...props} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" />
+    </div>
+  );
+}
+
+function ModernInfoCard({ icon, iconBg, label, value, colSpan = "" }) {
+  return (
+    <div className={`bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-gray-200 transition-all duration-200 ${colSpan}`}>
       <div className="flex items-center gap-3">
-        <div className={`w-8 h-8 ${iconBg} rounded-lg flex items-center justify-center`}>
-          {icon}
-        </div>
+        <div className={`w-8 h-8 ${iconBg} rounded-lg flex items-center justify-center`}>{icon}</div>
         <div className="flex-1 min-w-0">
-          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-            {label}
-          </div>
-          <div className="text-sm font-medium text-gray-900 truncate">
-            {value || 'Not specified'}
-          </div>
+          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{label}</div>
+          <div className="text-sm font-medium text-gray-900 truncate">{value || 'Not specified'}</div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function PaymentSection({ student }) {
+  return (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center gap-2 mb-6">
+          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+            <DollarSign className="w-4 h-4 text-green-600" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900">Payment History</h2>
+        </div>
+
+        <div className="space-y-6">
+          {/* Paid */}
+          <PaymentList title="Paid Months" icon={<CheckCircle className="w-4 h-4 text-green-600" />} color="green" items={student.paid_months} emptyText="No payments recorded" />
+          {/* Due */}
+          <PaymentList title="Due Months" icon={<XCircle className="w-4 h-4 text-red-600" />} color="red" items={student.due_months} emptyText="No dues pending" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PaymentList({ title, icon, color, items = [], emptyText }) {
+  const colorMap = {
+    green: { bg: "bg-green-50", border: "border-green-200", text: "text-green-700" },
+    red: { bg: "bg-red-50", border: "border-red-200", text: "text-red-700" },
+  };
+  const c = colorMap[color];
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3">
+        {icon}
+        <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">{title}</h3>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {items?.length > 0 ? (
+          items.map((month, idx) => (
+            <span key={idx} className={`inline-flex items-center gap-1 ${c.bg} ${c.text} text-xs font-medium px-3 py-1.5 rounded-full border ${c.border}`}>
+              {icon}
+              {month}
+            </span>
+          ))
+        ) : (
+          <div className="flex items-center gap-2 text-gray-500 text-sm bg-gray-50 px-3 py-2 rounded-xl">
+            <CheckCircle className="w-4 h-4" />
+            <span>{emptyText}</span>
+          </div>
+        )}
       </div>
     </div>
   );
