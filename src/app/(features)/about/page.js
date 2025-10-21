@@ -1,5 +1,7 @@
 'use client'
 
+import Link from "next/link"
+import Image from "next/image"
 import { CheckCircle, ArrowRight, Shield, Users, Target } from "lucide-react";
 
 export default function AboutPage() {
@@ -13,7 +15,7 @@ export default function AboutPage() {
     {
       name: "Tasin Rahman",
       role: "Frontend & Design",
-      img: "",
+      // set an image variable here
       bio: "Specializes in creating smooth UI and designing assets.",
     },
   ];
@@ -85,9 +87,11 @@ export default function AboutPage() {
           {team.map((member, idx) => (
             <div key={idx} className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-200 hover:border-blue-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 text-center group">
               <div className="relative inline-block mb-6">
-                <img
-                  src={member.img}
+                <Image
+                  src={member.img? `/${member.img}` : `https://api.dicebear.com/9.x/notionists/svg?seed=tasinrahman`}
                   alt={member.name}
+                  width={144}
+                  height={144}
                   className="w-32 h-32 sm:w-36 sm:h-36 rounded-full mx-auto object-cover border-4 border-gray-100 group-hover:border-blue-100 transition-colors"
                 />
                 <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-500 rounded-full shadow-lg" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
