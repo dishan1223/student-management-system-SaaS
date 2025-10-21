@@ -1,7 +1,8 @@
 'use client'
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Users, CreditCard, BarChart3, MessageSquare, Bell, GraduationCap, CheckCircle, ArrowRight, Menu, X, Info } from "lucide-react";
+import { Users, CreditCard, BarChart3, MessageSquare, Bell, GraduationCap, CheckCircle, ArrowRight, Menu, X, Info, Rocket } from "lucide-react";
 
 // CONFIGURATION OBJECT - Change your branding and content here
 const CONFIG = {
@@ -170,20 +171,22 @@ export default function HomePage() {
                     </span>
                   </>
                 ) : (
-                  <img 
-                    src={CONFIG.branding.logo} 
+                  <Image
+                    src={CONFIG.branding.logo}
                     alt={CONFIG.branding.name}
+                    width={32}
+                    height={32}
                     className="h-8 w-auto"
                   />
                 )}
               </div>
               <div className="flex items-center gap-3">
-                <a
+                <Link
                   href="/upgrade"
                   className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm"
                 >
                   Purchase
-                </a>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm border border-gray-300"
@@ -206,13 +209,13 @@ export default function HomePage() {
             </div>
             
             <div className="flex flex-col sm:flex-row justify-center gap-4 mb-10">
-              <a
+              <Link
                 href="/dashboard"
                 className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
               >
                 Go to Dashboard
                 <ArrowRight className="w-4 h-4" />
-              </a>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
@@ -258,15 +261,15 @@ export default function HomePage() {
             </div>
             
             <div className="hidden md:flex items-center gap-8">
-              <a href="/" className="text-gray-700 hover:text-gray-900 font-medium">HOME</a>
-              <a href="#pricing" className="text-gray-700 hover:text-gray-900 font-medium">PRICING</a>
-              <a href="/about" className="text-gray-700 hover:text-gray-900 font-medium">ABOUT US</a>
-              <a href="/sign-in" className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium border border-gray-300 rounded-lg">
+              <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium">HOME</Link>
+              <Link href="#pricing" className="text-gray-700 hover:text-gray-900 font-medium">PRICING</Link>
+              <Link href="/about" className="text-gray-700 hover:text-gray-900 font-medium">ABOUT US</Link>
+              <Link href="/sign-in" className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium border border-gray-300 rounded-lg">
                 Login
-              </a>
-              <a href="/sign-up" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium">
+              </Link>
+              <Link href="/sign-up" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium">
                 Get Started
-              </a>
+              </Link>
             </div>
 
             <button 
@@ -282,15 +285,15 @@ export default function HomePage() {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 bg-white">
             <div className="px-4 py-3 space-y-2">
-              <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">HOME</a>
-              <a href="#pricing" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">PRICING</a>
-              <a href="/about" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">ABOUT US</a>
-              <a href="/sign-in" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg border border-gray-300">
+              <Link href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">HOME</Link>
+              <Link href="#pricing" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">PRICING</Link>
+              <Link href="/about" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">ABOUT US</Link>
+              <Link href="/sign-in" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg border border-gray-300">
                 Login
-              </a>
-              <a href="/sign-up" className="block px-4 py-2 bg-blue-500 text-white rounded-lg text-center hover:bg-blue-600">
+              </Link>
+              <Link href="/sign-up" className="block px-4 py-2 bg-blue-500 text-white rounded-lg text-center hover:bg-blue-600">
                 Get Started
-              </a>
+              </Link>
             </div>
           </div>
         )}
@@ -317,13 +320,13 @@ export default function HomePage() {
               ))}
             </div>
 
-            <a 
+            <Link 
               href="/sign-up" 
               className="inline-flex items-center gap-2 px-8 py-4 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors font-semibold text-lg shadow-lg shadow-blue-500/30"
             >
               Get Started
               <ArrowRight className="w-5 h-5" />
-            </a>
+            </Link>
 
             <div className="mt-8 flex items-center gap-2 text-gray-500">
               <Info className="w-4 h-4" />
@@ -397,62 +400,46 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Pricing Section */}
-      <div id="pricing" className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
-              {CONFIG.pricing.sectionTitle}
+      {/* Launching Soon Section */}
+      <div id="pricing" className="py-20 bg-gradient-to-br from-blue-50 via-white to-blue-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="bg-white rounded-3xl shadow-xl border-2 border-blue-100 p-12 md:p-16">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mb-6 shadow-lg">
+              <Rocket className="w-10 h-10 text-white" />
+            </div>
+            
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
+              Launching Soon
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              {CONFIG.pricing.sectionSubtitle}
+            
+            <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+              We're working hard to bring you the best coaching management experience. Stay tuned for our official launch!
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {CONFIG.pricing.plans.map((plan, idx) => (
-              <div 
-                key={idx} 
-                className={`bg-white rounded-2xl p-8 border-2 relative hover:shadow-xl transition-all ${
-                  plan.popular 
-                    ? 'border-blue-500 shadow-lg scale-105' 
-                    : 'border-gray-200'
-                }`}
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link 
+                href="/sign-up" 
+                className="inline-flex items-center gap-2 px-8 py-4 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors font-semibold text-lg shadow-lg shadow-blue-500/30"
               >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold shadow-lg">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">{plan.name}</h3>
-                  <div className="mb-2">
-                    <span className="text-4xl font-bold text-gray-900">৳{plan.price}</span>
-                    {plan.price !== "Custom" && <span className="text-gray-600">/{plan.duration}</span>}
-                  </div>
-                </div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, fIdx) => (
-                    <li key={fIdx} className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <a 
-                  href="/upgrade" 
-                  className={`block w-full py-3 rounded-xl font-semibold text-center transition-all ${
-                    plan.popular 
-                      ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-lg' 
-                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200 border border-gray-300'
-                  }`}
-                >
-                  Get Started
-                </a>
+                Get Early Access
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+            
+            <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+              <div>
+                <div className="text-3xl font-bold text-blue-500 mb-2">2</div>
+                <div className="text-gray-600">Team of Developers</div>
               </div>
-            ))}
+              <div>
+                <div className="text-3xl font-bold text-blue-500 mb-2">24/7</div>
+                <div className="text-gray-600">Support Coming</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-blue-500 mb-2">100%</div>
+                <div className="text-gray-600">Dedication</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -467,9 +454,9 @@ export default function HomePage() {
             <div className="flex items-center justify-center gap-6 text-sm text-gray-600 flex-wrap">
               {CONFIG.footer.links.map((link, idx) => (
                 <span key={idx} className="flex items-center gap-6">
-                  <a href={link.href} className="hover:text-gray-900 transition-colors">
+                  <Link href={link.href} className="hover:text-gray-900 transition-colors">
                     {link.text}
-                  </a>
+                  </Link>
                   {idx < CONFIG.footer.links.length - 1 && <span className="text-gray-400">•</span>}
                 </span>
               ))}

@@ -17,6 +17,7 @@ export default function UpgradePlan() {
         "Result Dashboard",
       ],
     },
+    /*
     {
       id: "Basic",
       name: "Basic",
@@ -50,6 +51,7 @@ export default function UpgradePlan() {
         "Priority Support & Custom Branding",
       ],
     },
+    */
   ];
 
   const [selected, setSelected] = useState(null);
