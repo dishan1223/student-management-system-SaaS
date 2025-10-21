@@ -132,7 +132,7 @@ export default function AboutPage() {
               Building the Future of Education Management
             </h3>
             <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6 sm:mb-8 leading-relaxed">
-              We're a passionate startup committed to creating secure, scalable, and user-friendly solutions for educational institutions. Our platform is built with modern technology and best practices from day one.
+              We&apos;re a passionate startup committed to creating secure, scalable, and user-friendly solutions for educational institutions. Our platform is built with modern technology and best practices from day one.
             </p>
             <div className="flex flex-wrap justify-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-700 font-medium">
               <span className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white rounded-lg border border-gray-200">Cloud-Based</span>
