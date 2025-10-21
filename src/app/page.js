@@ -1,6 +1,7 @@
 'use client'
 
 import Link from "next/link";
+import Image from 'next/image'
 import { useEffect, useState } from "react";
 import { Users, CreditCard, BarChart3, MessageSquare, Bell, GraduationCap, CheckCircle, ArrowRight, Menu, X, Info, Rocket } from "lucide-react";
 
@@ -413,7 +414,7 @@ export default function HomePage() {
             </h2>
             
             <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-              We're working hard to bring you the best coaching management experience. Stay tuned for our official launch!
+              We&apos;re working hard to bring you the best coaching management experience. Stay tuned for our official launch!
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
