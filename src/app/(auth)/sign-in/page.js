@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, Lock, ArrowRight, CheckCircle, X } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, CheckCircle, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-export default function SignInPage() {
-  const router = useRouter();
 
-  const [form, setForm] = useState({ email: '', password: '' });
+
+export default function SignupPage() {
+  const router = useRouter()
+
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -26,48 +28,43 @@ export default function SignInPage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
-      credentials: 'include', // ✅ allow cookies
     });
 
     const data = await res.json();
     setIsLoading(false);
-
+    
     if (res.ok) {
       setShowSuccess(true);
       setProgress(100);
-
-      // animate progress bar
-      const duration = 3000;
+      
+      // Animate progress bar
+      const duration = 3000; // 5 seconds
       const interval = 50;
       const steps = duration / interval;
       const decrement = 100 / steps;
-
+      
       let currentProgress = 100;
       const timer = setInterval(() => {
         currentProgress -= decrement;
         if (currentProgress <= 0) {
           clearInterval(timer);
           setShowSuccess(false);
-          router.push('/');
+          router.push("/");
         } else {
           setProgress(currentProgress);
         }
       }, interval);
     } else {
-      setMessage(`❌ ${data.error || 'Sign in failed'}`);
+      setMessage(`❌ ${data.error || 'Signup failed'}`);
     }
   };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       {/* Success Popup */}
-      <div
-        className={`fixed top-4 left-4 right-4 md:top-6 md:right-6 md:left-auto bg-white rounded-xl shadow-2xl overflow-hidden transition-all duration-500 z-50 ${
-          showSuccess
-            ? 'translate-y-0 opacity-100'
-            : '-translate-y-full opacity-0'
-        } md:w-96`}
-      >
+      <div className={`fixed top-4 left-4 right-4 md:top-6 md:right-6 md:left-auto bg-white rounded-xl shadow-2xl overflow-hidden transition-all duration-500 z-50 ${
+        showSuccess ? 'translate-y-0 md:translate-y-0 md:translate-x-0 opacity-100' : '-translate-y-full md:translate-y-0 md:translate-x-full opacity-0'
+      } md:w-96`}>
         <div className="p-4 md:p-5">
           <div className="flex items-start justify-between mb-2 md:mb-3">
             <div className="flex items-center gap-2 md:gap-3">
@@ -76,31 +73,29 @@ export default function SignInPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900 text-sm md:text-base">Success!</h3>
-                <p className="text-xs md:text-sm text-gray-600">Signed in successfully</p>
+                <p className="text-xs md:text-sm text-gray-600">Account created successfully</p>
               </div>
             </div>
-            <button
+            <button 
               onClick={() => setShowSuccess(false)}
               className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
             >
               <X className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           </div>
-          <p className="text-xs md:text-sm text-gray-500 ml-9 md:ml-11">
-            Redirecting you to the dashboard...
-          </p>
+          <p className="text-xs md:text-sm text-gray-500 ml-9 md:ml-11">Redirecting you to the dashboard...</p>
         </div>
         {/* Progress Bar */}
         <div className="h-1 bg-gray-200">
-          <div
+          <div 
             className="h-full bg-green-500 transition-all duration-50 ease-linear"
             style={{ width: `${progress}%` }}
           />
         </div>
       </div>
 
-      {/* Form Section */}
       <div className="w-full max-w-md">
+        {/* Logo/Branding */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4 shadow-lg">
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,12 +103,15 @@ export default function SignInPage() {
             </svg>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Sign In</h1>
-          <p className="text-gray-600">Welcome back! Access your account</p>
+          <p className="text-gray-600">Start your journey with us today</p>
         </div>
 
+        {/* Form Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email */}
+            
+
+            {/* Email Input */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address
@@ -135,7 +133,7 @@ export default function SignInPage() {
               </div>
             </div>
 
-            {/* Password */}
+            {/* Password Input */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Password
@@ -157,15 +155,13 @@ export default function SignInPage() {
               </div>
             </div>
 
-            {/* Error Message */}
+            {/* Message Display */}
             {message && (
-              <div
-                className={`p-3 rounded-lg text-sm ${
-                  message.includes('✅')
-                    ? 'bg-green-50 text-green-700 border border-green-200'
-                    : 'bg-red-50 text-red-700 border border-red-200'
-                }`}
-              >
+              <div className={`p-3 rounded-lg text-sm ${
+                message.includes('✅') 
+                  ? 'bg-green-50 text-green-700 border border-green-200' 
+                  : 'bg-red-50 text-red-700 border border-red-200'
+              }`}>
                 {message}
               </div>
             )}
@@ -186,12 +182,20 @@ export default function SignInPage() {
               )}
             </button>
           </form>
+
         </div>
 
+        {/* Footer Branding */}
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500">
-            Powered by <span className="font-semibold text-gray-700">Loom Softwares</span>
+            Powered by{' '}
+            <span className="font-semibold text-gray-700">Loom Softwares</span>
           </p>
+          <div className="mt-4 flex items-center justify-center gap-6 text-xs text-gray-500">
+            <a href="#" className="hover:text-gray-700 transition-colors">Privacy Policy</a>
+            <span>•</span>
+            <a href="#" className="hover:text-gray-700 transition-colors">Terms of Service</a>
+          </div>
         </div>
       </div>
     </div>

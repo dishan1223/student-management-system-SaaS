@@ -1,58 +1,47 @@
+// src/app/api/students/route.js
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
-import bcrypt from "bcrypt";
+import { ObjectId } from "mongodb";
 import jwt from "jsonwebtoken";
 
 export async function POST(req) {
+  let student;
   try {
-    const { email, password } = await req.json();
-
-    if (!email || !password) {
-      return NextResponse.json({ error: "Email and password required" }, { status: 400 });
-    }
-
-    const client = await clientPromise;
-    const db = client.db(process.env.MONGODB_DB);
-    const users = db.collection("users");
-
-    const user = await users.findOne({ email });
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    // ✅ Ensure same hashing logic as signup
-    const combinedPassword = password + process.env.JWT_SECRET;
-    const isMatch = await bcrypt.compare(combinedPassword, user.password);
-    if (!isMatch) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-    }
-
-    const token = jwt.sign(
-      { userId: user._id, plan: user.plan },
-      process.env.JWT_SECRET,
-      { expiresIn: "30d" }
-    );
-
-    const response = NextResponse.json({
-      success: true,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        plan: user.plan,
-      },
-    });
-
-    response.cookies.set("token", token, {
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60, // 30 days
-      sameSite: "strict",
-      path: "/",
-    });
-
-    return response;
+    student = await req.json();
   } catch (err) {
-    console.error("Login error:", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ error: "Cannot parse JSON" }, { status: 400 });
   }
+
+  // Get token from cookies
+  const token = req.cookies.get("token")?.value;
+  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+  }
+
+  // Assign a new ObjectId and createdBy
+  student._id = new ObjectId();
+  student.createdBy = new ObjectId(decoded.userId);
+
+  let client;
+  try {
+    client = await clientPromise;
+  } catch (err) {
+    return NextResponse.json({ error: "Failed to connect to database" }, { status: 500 });
+  }
+
+  const db = client.db(process.env.MONGODB_DB);
+  const collection = db.collection("students");
+
+  try {
+    await collection.insertOne(student);
+  } catch (err) {
+    return NextResponse.json({ error: "Cannot insert student" }, { status: 500 });
+  }
+
+  return NextResponse.json(student, { status: 201 });
 }
