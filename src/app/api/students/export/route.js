@@ -43,6 +43,7 @@ export async function GET() {
     
     // this key is to delete redis chache later after the operation
     const cacheKey = `students_excel:${userId}`;
+    const studentCacheKey = `students:${userId}`;
 
     // redis is not being used to get data.
     // we are getting data from mongodb
@@ -173,6 +174,7 @@ export async function GET() {
 
     // Delete redis cache for this user (even though we don't use it)
     await redis.del(cacheKey);
+    await redis.del(studentCacheKey)
 
     return new NextResponse(buffer, {
       status: 200,
