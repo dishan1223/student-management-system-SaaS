@@ -15,7 +15,7 @@ if (!uri || !dbName) throw new Error('Missing MongoDB config');
 const client = new MongoClient(uri);
 const clientPromise = client.connect();
 
-// Redis client
+// Redis client (ONLY for deleting cache now)
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
@@ -40,33 +40,17 @@ export async function GET() {
       return NextResponse.json({ error: 'Invalid user' }, { status: 401 });
     }
 
-    // --- Redis cache key ---
+    
+    // this key is to delete redis chache later after the operation
     const cacheKey = `students_excel:${userId}`;
 
-
-    const cachedBuffer = await redis.get(cacheKey);
-    if (cachedBuffer) {
-      const buffer = Buffer.from(cachedBuffer, 'base64');
-      const currentMonth = new Date()
-        .toLocaleString('default', { month: 'long', year: 'numeric' })
-        .replace(' ', '_');
-
-      return new NextResponse(buffer, {
-        status: 200,
-        headers: {
-          'Content-Type':
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          'Content-Disposition': `attachment; filename=students_export_${currentMonth}.xlsx`,
-          'X-Cache': 'HIT',
-        },
-      });
-    }
-
-    
+    // redis is not being used to get data.
+    // we are getting data from mongodb
     const db = (await clientPromise).db(dbName);
     const studentsCol = db.collection('students');
     const batchesCol = db.collection('batches');
 
+    // Fetch all students created by this user
     const students = await studentsCol
       .find({ createdBy: new ObjectId(userId) })
       .toArray();
@@ -75,6 +59,7 @@ export async function GET() {
       return NextResponse.json({ error: 'No students found' }, { status: 404 });
     }
 
+    // Collect unique batch IDs
     const batchIds = [
       ...new Set(students.map((s) => s.batch_id).filter(Boolean)),
     ].map((id) => new ObjectId(id));
@@ -83,7 +68,7 @@ export async function GET() {
       ? await batchesCol.find({ _id: { $in: batchIds } }).toArray()
       : [];
 
-   
+    // Create Excel file
     const workbook = new ExcelJS.Workbook();
 
     const createSheet = (name) => {
@@ -137,7 +122,7 @@ export async function GET() {
       });
     }
 
-    // Unassigned students
+    // Unassigned students sheet
     const unassigned = students.filter((s) => !s.batch_id);
     if (unassigned.length) {
       const sheet = createSheet('Unassigned Students');
@@ -168,7 +153,7 @@ export async function GET() {
       sheet.getRow(1).font = { bold: true };
     }
 
-    
+    // Payment processing
     const currentMonth = new Date()
       .toLocaleString('default', { month: 'long', year: 'numeric' })
       .replace(' ', '_');
@@ -177,15 +162,17 @@ export async function GET() {
       { createdBy: new ObjectId(userId), payment_status: false },
       { $addToSet: { due_months: currentMonth } }
     );
+
     await studentsCol.updateMany(
       { createdBy: new ObjectId(userId) },
       { $set: { payment_status: false } }
     );
 
+    // Convert workbook to buffer
     const buffer = await workbook.xlsx.writeBuffer();
 
-    
-    await redis.set(cacheKey, buffer.toString('base64'), { ex: 600 });
+    // Delete redis cache for this user (even though we don't use it)
+    await redis.del(cacheKey);
 
     return new NextResponse(buffer, {
       status: 200,
@@ -193,7 +180,7 @@ export async function GET() {
         'Content-Type':
           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'Content-Disposition': `attachment; filename=students_export_${currentMonth}.xlsx`,
-        'X-Cache': 'MISS',
+        'X-Cache': 'DISABLED',
       },
     });
   } catch (err) {
