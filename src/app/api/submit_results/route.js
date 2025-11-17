@@ -102,19 +102,22 @@ export async function POST(req) {
 
       // --- Send SMS ---
       const message = MarksTemplate(name, mark.total, mark.subject, mark.obtained);
+
       try {
-        const formData = new URLSearchParams();
-        formData.append("api_key", process.env.SMS_BD_API_KEY);
-        formData.append("to", phone);
-        formData.append("msg", message);
+        // FIX: Payload must be a single object, not an array
+        const payload = {
+          callerID: "loomsoftwares",
+          toUser: phone,
+          messageContent: message,
+        };
 
-        const response = await fetch("https://api.sms.net.bd/sendsms", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: formData,
-        });
+        const url = `http://118.67.213.114:3775/send?apikey=${process.env.SMS_API_KEY}&secretkey=${process.env.SMS_SECRET_KEY}&content=${encodeURIComponent(
+          JSON.stringify(payload)
+        )}`;
 
+        const response = await fetch(url, { method: "GET" });
         const result = await response.text();
+
         console.log(`SMS sent to ${phone}: ${result}`);
         smsResults.push({ phone, success: true, result });
       } catch (err) {

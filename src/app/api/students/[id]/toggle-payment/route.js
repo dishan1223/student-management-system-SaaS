@@ -3,6 +3,23 @@ import clientPromise from "@/lib/mongodb";
 import jwt from "jsonwebtoken";
 import { Redis } from "@upstash/redis";
 
+function formatPhoneNumber(phone) {
+  if (!phone) throw new Error("Phone number is required");
+
+  phone = phone.replace(/[\s\-\(\)]/g, "");
+
+  if (phone.startsWith("+880")) {
+    return phone.slice(1);
+  } else if (phone.startsWith("880")) {
+    return phone;
+  } else if (phone.startsWith("0")) {
+    return "88" + phone;
+  } else if (/^1\d{9}$/.test(phone)) {
+    return "880" + phone;
+  }
+
+  throw new Error("Invalid Bangladeshi phone number format");
+}
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
@@ -16,12 +33,10 @@ export async function PATCH(req, { params }) {
     return new Response(JSON.stringify({ error: "Invalid ID" }), { status: 400 });
   }
 
-
   const token = req.cookies.get("token")?.value;
   if (!token) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
-
 
   let decoded;
   try {
@@ -35,7 +50,6 @@ export async function PATCH(req, { params }) {
     const db = client.db(process.env.MONGODB_DB);
     const collection = db.collection("students");
 
-
     const student = await collection.findOne({
       _id: new ObjectId(id),
       createdBy: new ObjectId(decoded.userId),
@@ -44,7 +58,6 @@ export async function PATCH(req, { params }) {
     if (!student) {
       return new Response(JSON.stringify({ error: "Student not found" }), { status: 404 });
     }
-
 
     const now = new Date();
     const day = String(now.getDate()).padStart(2, "0");
@@ -57,12 +70,48 @@ export async function PATCH(req, { params }) {
     let newPaymentStatus = !student.payment_status;
 
     if (newPaymentStatus) {
-      // Unpaid → Paid
+
       if (!updatedPaidMonths.includes(paymentDate)) {
         updatedPaidMonths.push(paymentDate);
       }
+
       updatedDueMonths = updatedDueMonths.filter((m) => m !== paymentDate);
+
       console.log(`✅ Payment received for ${student.name} on ${paymentDate}`);
+
+      // -------------------------------------------------------------
+      // FIXED SMS — SINGLE JSON OBJECT — NO DOUBLE SMS
+      // -------------------------------------------------------------
+      try {
+        const phone = student.phone_number;
+
+        if (phone) {
+          const formattedPhoneNumber = formatPhoneNumber(phone);
+
+          const amount = student.fee ?? student.payment_amount ?? 0;
+
+          const smsText = `Studify: Payment ${amount} BDT for ${student.name} received on ${paymentDate}.`;
+
+          const payload = {
+            apikey: process.env.SMS_API_KEY,
+            secretkey: process.env.SMS_SECRET_KEY,
+            callerID: "loomsoftwares",
+            toUser: formattedPhoneNumber,
+            messageContent: smsText,
+          };
+
+          await fetch("http://118.67.213.114:3775/send", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+        }
+      } catch (err) {
+        console.error("SMS send failed:", err.message);
+      }
+      // -------------------------------------------------------------
     }
 
     await collection.updateOne(
@@ -78,7 +127,6 @@ export async function PATCH(req, { params }) {
 
     const updatedStudent = await collection.findOne({ _id: new ObjectId(id) });
 
-    
     const cacheKey = `students:${decoded.userId}`;
     await redis.del(cacheKey);
 
