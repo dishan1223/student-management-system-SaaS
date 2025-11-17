@@ -69,7 +69,7 @@ export async function PATCH(req, { params }) {
     let updatedDueMonths = student.due_months || [];
     let newPaymentStatus = !student.payment_status;
 
-    if (newPaymentStatus) {
+    if (!student.payment_status && newPaymentStatus) {
 
       if (!updatedPaidMonths.includes(paymentDate)) {
         updatedPaidMonths.push(paymentDate);
@@ -108,6 +108,7 @@ export async function PATCH(req, { params }) {
             body: JSON.stringify(payload),
           });
         }
+        console.log("PATCH route HIT", Date.now());
       } catch (err) {
         console.error("SMS send failed:", err.message);
       }

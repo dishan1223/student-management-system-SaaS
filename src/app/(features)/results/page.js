@@ -11,6 +11,7 @@ export default function ResultsPage() {
   const [marks, setMarks] = useState({});
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false); // ✅ FIX
 
   // Fetch data
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function ResultsPage() {
       }
     }
     fetchData();
-  }, [subjectFilter,totalMarksFilter]);
+  }, [subjectFilter, totalMarksFilter]);
 
   // Filter by batch
   useEffect(() => {
@@ -75,6 +76,9 @@ export default function ResultsPage() {
   };
 
   const handleSubmit = async () => {
+    if (submitting) return; // ✅ Prevent duplicate calls
+    setSubmitting(true);
+
     const resultData = filtered.map((s) => {
       const m = marks[s._id] || {};
       return {
@@ -101,11 +105,12 @@ export default function ResultsPage() {
 
       if (!res.ok) throw new Error("Failed to submit");
 
-
       alert("✅ Results submitted via SMS successfully!");
     } catch (err) {
       console.error(err);
       alert("❌ Error submitting results");
+    } finally {
+      setSubmitting(false); // ✅ Reset
     }
   };
 
@@ -299,14 +304,14 @@ export default function ResultsPage() {
             <div className="flex flex-col items-center lg:items-end mt-10 space-y-3">
               <button
                 onClick={handleSubmit}
-                disabled={!hasMarks}
+                disabled={!hasMarks || submitting} // ← also prevents double click
                 className={`w-full sm:w-auto px-10 py-3.5 rounded-xl font-semibold text-base shadow-lg transition-all duration-200 ${
-                  hasMarks
+                  hasMarks && !submitting
                     ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 hover:shadow-xl transform hover:-translate-y-0.5 cursor-pointer"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
                 }`}
               >
-                Send Results
+                {submitting ? "Sending..." : "Send Results"}
               </button>
             </div>
           </>

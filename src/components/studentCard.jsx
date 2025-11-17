@@ -18,19 +18,22 @@ export default function StudentCard({
   const [deleted, setDeleted] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const handleStatusClick = async (e) => {
+    e.stopPropagation(); // 🔥 FIX: prevents Link from causing double API call
 
-  const handleStatusClick = async () => {
     if (!window.confirm("Are you sure you want to change payment status?")) return;
     setLoading(true);
+
     try {
       const res = await fetch(
         `/api/students/${id}/toggle-payment`,
-        { method: "PATCH" ,
-            headers: {
-                "Content-Type": "application/json",
-            }
+        { method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          }
         }
       );
+
       if (res.ok) {
         setPaid((prev) => !prev);
       } else {
@@ -44,13 +47,17 @@ export default function StudentCard({
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (e) => {
+    e.stopPropagation(); // 🔥 Prevents accidental double delete
+
     if (!window.confirm("Are you sure you want to delete this student?")) return;
+
     try {
       const res = await fetch(
         `/api/students/${id}/delete`,
         { method: "DELETE" }
       );
+
       if (res.ok) {
         setDeleted(true);
         if (onDeleteSuccess) onDeleteSuccess(id);

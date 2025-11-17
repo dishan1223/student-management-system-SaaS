@@ -104,12 +104,14 @@ export async function POST(req) {
       const message = MarksTemplate(name, mark.total, mark.subject, mark.obtained);
 
       try {
-        // FIX: Payload must be a single object, not an array
-        const payload = {
-          callerID: "loomsoftwares",
-          toUser: phone,
-          messageContent: message,
-        };
+        // FIX: content MUST be an array according to API docs
+        const payload = [
+          {
+            callerID: "loomsoftwares",
+            toUser: phone,
+            messageContent: message,
+          }
+        ];
 
         const url = `http://118.67.213.114:3775/send?apikey=${process.env.SMS_API_KEY}&secretkey=${process.env.SMS_SECRET_KEY}&content=${encodeURIComponent(
           JSON.stringify(payload)

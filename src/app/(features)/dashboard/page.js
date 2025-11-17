@@ -59,11 +59,10 @@ function formatBDT(amount){
   return Number(amount).toLocaleString("en-IN"); 
 }
 
-
 export default function Home() {
 
-
   useRequirePaid()
+
   const [students, setStudents] = useState([]);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -73,9 +72,18 @@ export default function Home() {
   const [selectedBatch, setSelectedBatch] = useState("");
   const [selectedStudyDays, setSelectedStudyDays] = useState("");
 
+  // NEW: SMS Modal state
+  const [showSmsModal, setShowSmsModal] = useState(false);
 
+  // Show SMS modal once
+  useEffect(() => {
+    const alreadyShown = localStorage.getItem("smsIntegrationShown");
+    if (!alreadyShown) {
+      setShowSmsModal(true);
+      localStorage.setItem("smsIntegrationShown", "true");
+    }
+  }, []);
 
-  // Check localStorage for PIN on mount
   // Fetch students
   useEffect(() => {
     
@@ -84,7 +92,6 @@ export default function Home() {
         const res = await fetch(`/api/students`);
         const data = await res.json();
 
-        // Ensure we always have an array
         const safeData = Array.isArray(data) ? data : [];
         setStudents(safeData);
         setResults(safeData);
@@ -99,22 +106,18 @@ export default function Home() {
     fetchStudents();
   }, []);
 
-  // Safe defaults for mapping
   const safeStudents = Array.isArray(students) ? students : [];
   const safeResults = Array.isArray(results) ? results : [];
 
-  // Filters
   const batchTimes = [...new Set(safeStudents.map((s) => s?.batch_time || ""))];
   const studyDays = [...new Set(safeStudents.flatMap((s) => s?.study_days || []))];
 
-  // Apply filters
   const filteredResults = safeResults.filter((student) => {
     const batchMatch = selectedBatch ? student?.batch_time === selectedBatch : true;
     const studyDaysMatch = selectedStudyDays ? student?.study_days?.includes(selectedStudyDays) : true;
     return batchMatch && studyDaysMatch;
   });
 
-  // Stats
   const total = safeStudents.length;
   const totalPaid = safeStudents.filter((student) => student?.payment_status).length;
   const unpaid = total - totalPaid;
@@ -122,25 +125,6 @@ export default function Home() {
     .filter(s => s.payment_status)
     .reduce((sum, s) => sum + (s.payment_amount || 0), 0);
 
-  // Handle PIN submission
-  const handlePinSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch(`/api/login?pin=${pinInput}`);
-      const data = await res.json();
-      if (data.success) {
-        localStorage.setItem("userPin", pinInput);
-        setPinEntered(true);
-      } else {
-        alert("Invalid PIN");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Server error");
-    }
-  };
- 
-  // Main dashboard content
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -156,7 +140,6 @@ export default function Home() {
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-5 lg:mb-6">
           
-          {/* Total Students */}
           <Link href="/students" className="group">
             <div className="bg-white rounded-2xl p-3 lg:p-4 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all duration-200">
               <div className="flex lg:flex-col items-center lg:items-start gap-2 lg:gap-0 mb-1 lg:mb-2">
@@ -171,7 +154,6 @@ export default function Home() {
             </div>
           </Link>
 
-          {/* Total Paid */}
           <Link href="/total-paid" className="group">
             <div className="bg-white rounded-2xl p-3 lg:p-4 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all duration-200">
               <div className="flex lg:flex-col items-center lg:items-start gap-2 lg:gap-0 mb-1 lg:mb-2">
@@ -189,7 +171,6 @@ export default function Home() {
             </div>
           </Link>
 
-          {/* Total Unpaid */}
           <Link href="/total-unpaid" className="group">
             <div className="bg-white rounded-2xl p-3 lg:p-4 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all duration-200">
               <div className="flex lg:flex-col items-center lg:items-start gap-2 lg:gap-0 mb-1 lg:mb-2">
@@ -207,7 +188,6 @@ export default function Home() {
             </div>
           </Link>
 
-          {/* Total Paid Amount */}
           <div className="bg-white rounded-2xl p-3 lg:p-4 shadow-sm border border-gray-100">
             <div className="flex lg:flex-col items-center lg:items-start gap-2 lg:gap-0 mb-1 lg:mb-2">
               <div className="w-8 h-8 lg:w-10 lg:h-10 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0 lg:mb-3">
@@ -221,14 +201,10 @@ export default function Home() {
           </div>
         </div>
 
-        
-
-        {/* Section Header */}
         <div className="mb-5 lg:mb-6">
           <SectionHeader />
         </div>
 
-        {/* Action Buttons Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
           <ModernButton 
             title="Results" 
@@ -252,7 +228,6 @@ export default function Home() {
             variant="primary"
           />
           
-          
           <ModernButton 
             title="Add Student" 
             href="/add-students-to-batch" 
@@ -260,7 +235,6 @@ export default function Home() {
             variant="success"
           />
           
-          {/* More Options Button */}
           <button
             onClick={() => setShowMoreOptions(true)}
             className="group relative flex flex-col lg:flex-row items-center justify-center gap-2 px-4 py-3 rounded-2xl font-semibold transition-all duration-200 hover:-translate-y-1 hover:shadow-md text-sm bg-purple-600 text-white hover:bg-purple-700 shadow-sm"
@@ -270,7 +244,6 @@ export default function Home() {
           </button>
         </div>
 
-        {/* More Options Modal */}
         {showMoreOptions && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowMoreOptions(false)}>
             <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
@@ -302,7 +275,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* Download & Actions Section */}
         <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-6 mb-6 border border-blue-100">
           <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
             <Eye className="w-5 h-5 text-blue-600" />
@@ -323,9 +295,28 @@ export default function Home() {
           </div>
         </div>
 
-        
-
       </div>
+
+      {/* ✅ SMS Integrated Modal */}
+      {showSmsModal && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-xl text-center relative">
+            <h2 className="text-xl font-bold text-gray-900 mb-2">🎉 SMS Integrated!</h2>
+            <p className="text-gray-600 text-sm mb-4">
+              Your SMS service is now connected.  
+              You can now send notifications to students instantly.
+            </p>
+
+            <button
+              onClick={() => setShowSmsModal(false)}
+              className="w-full py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition"
+            >
+              Got it!
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
