@@ -14,6 +14,10 @@ export default function DownloadButton() {
         method: "GET",
       });
 
+      if(res.status === 200){
+        window.location.reload();
+      }
+
       if (res.status === 401){
         alert("login to download report");
       }

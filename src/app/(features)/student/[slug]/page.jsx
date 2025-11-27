@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useParams } from "next/navigation";
@@ -218,6 +217,86 @@ export default function StudentDetails() {
             </div>
           </div>
         </div>
+
+        {/* =======================
+              EDIT STUDENT MODAL
+        ========================== */}
+        {showForm && (
+          <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl">
+              <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                <h2 className="text-xl font-semibold text-gray-900">Edit Student</h2>
+                <button
+                  onClick={() => setShowForm(false)}
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <label className="secondary-font">Update Student Name</label>
+                <input
+                  name="name"
+                  defaultValue={student.name}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-lg p-3"
+                  placeholder="Full Name"
+                />
+                <label className="secondary-font">Update Phone Number</label>
+                <input
+                  name="phone_number"
+                  defaultValue={student.phone_number}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-lg p-3"
+                  placeholder="Phone Number"
+                />
+
+                <label className="secondary-font">Update batch</label>
+                <select
+                  name="batch_id"
+                  defaultValue={student.batch_id}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-lg p-3"
+                >
+                  <option value="">Select Batch</option>
+                  {allBatches.map((b) => (
+                    <option key={b._id} value={b._id}>
+                      {b.batch_name}
+                    </option>
+                  ))}
+                </select>
+
+                <label className="secondary-font">Update Payment</label>
+                <input
+                  name="payment_amount"
+                  defaultValue={student.payment_amount}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-lg p-3"
+                  placeholder="Payment Amount"
+                />
+
+                <div className="flex justify-end gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowForm(false)}
+                    className="px-4 py-2 border border-gray-200 rounded-xl"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={updating}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-xl"
+                  >
+                    {updating ? "Saving..." : "Save Changes"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
         {/* Due Month Removal Modal */}
         {showDueModal && (

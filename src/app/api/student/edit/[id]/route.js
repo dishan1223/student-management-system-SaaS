@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import clientPromise from "@/lib/mongodb";
 import { Redis } from "@upstash/redis";
+import { cookies } from "next/headers";
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
@@ -13,17 +14,32 @@ export async function PATCH(req, { params }) {
 
   if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
 
+  const token = req.cookies.get("token")?.value;
+  if (!token) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    console.log(err);
+    return new Response(JSON.stringify({ error: "Invalid token" }), { status: 401 });
+  }
+
   let objId;
   try {
     objId = new ObjectId(id);
-  } catch {
+  } catch(err) {
+    console.log(err)
     return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
   }
 
   let updateData;
   try {
     updateData = await req.json();
-  } catch {
+  } catch(err) {
+    console.log(err)
     return NextResponse.json({ error: "Cannot parse request body" }, { status: 400 });
   }
 
@@ -59,7 +75,7 @@ export async function PATCH(req, { params }) {
   if (res.matchedCount === 0)
     return NextResponse.json({ error: "Student not found" }, { status: 404 });
 
-  await redis.del(`student:${id}`);
+  await redis.del(`students:${decoded.userId}`);
 
   return NextResponse.json({ message: "Student updated successfully" });
 }
