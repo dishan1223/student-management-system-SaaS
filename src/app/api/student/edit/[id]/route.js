@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 import clientPromise from "@/lib/mongodb";
 import { Redis } from "@upstash/redis";
 import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
