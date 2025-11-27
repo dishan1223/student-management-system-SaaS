@@ -18,10 +18,24 @@ import {
   BarChart3, 
   UserPlus,
   Bell,
-  LogOut
+  LogOut,
+  Info
 } from "lucide-react";
 
 import useRequirePaid from "@/utils/requireAuth";
+
+// Update this version number whenever you release new updates
+const CURRENT_VERSION = "0.2.1";
+
+// Define your updates here
+const UPDATES = {
+  "0.2.1": {
+    fixed: [
+      "Fixed student export and payment status reseting button",
+      "Fixed student edit feature",
+    ]
+  },
+};
 
 // Modern Button Component
 function ModernButton({ title, href, icon: Icon, variant = "default", visibility }) {
@@ -55,13 +69,11 @@ function ModernDummyButton({ title, icon: Icon }) {
 
 function formatBDT(amount){
   if(isNaN(Number(amount))) return amount;
-
   return Number(amount).toLocaleString("en-IN"); 
 }
 
 export default function Home() {
-
-  useRequirePaid()
+  useRequirePaid();
 
   const [students, setStudents] = useState([]);
   const [results, setResults] = useState([]);
@@ -72,8 +84,12 @@ export default function Home() {
   const [selectedBatch, setSelectedBatch] = useState("");
   const [selectedStudyDays, setSelectedStudyDays] = useState("");
 
-  // NEW: SMS Modal state
+  // SMS Modal state
   const [showSmsModal, setShowSmsModal] = useState(false);
+  
+  // NEW: Updates Modal state
+  const [showUpdatesModal, setShowUpdatesModal] = useState(false);
+  const [updatesToShow, setUpdatesToShow] = useState({ new: [], fixed: [] });
 
   // Show SMS modal once
   useEffect(() => {
@@ -84,9 +100,45 @@ export default function Home() {
     }
   }, []);
 
+  // NEW: Check for updates
+  useEffect(() => {
+    const lastSeenVersion = localStorage.getItem("lastSeenVersion");
+    
+    // If user hasn't seen this version before, show updates
+    if (lastSeenVersion !== CURRENT_VERSION) {
+      // Collect all updates since the last seen version
+      const allUpdates = { new: [], fixed: [] };
+      let shouldShowUpdates = false;
+      
+      // Get all version keys and sort them
+      const versionKeys = Object.keys(UPDATES).sort();
+      
+      // Find the index of the last seen version
+      const lastSeenIndex = lastSeenVersion ? versionKeys.indexOf(lastSeenVersion) : -1;
+      
+      // Collect all updates after the last seen version
+      for (let i = lastSeenIndex + 1; i < versionKeys.length; i++) {
+        const version = versionKeys[i];
+        if (UPDATES[version]) {
+          // FIX: Use nullish coalescing operator to provide empty arrays as defaults
+          const newFeatures = UPDATES[version].new ?? [];
+          const bugFixes = UPDATES[version].fixed ?? [];
+          
+          allUpdates.new.push(...newFeatures);
+          allUpdates.fixed.push(...bugFixes);
+          shouldShowUpdates = true;
+        }
+      }
+      
+      if (shouldShowUpdates) {
+        setUpdatesToShow(allUpdates);
+        setShowUpdatesModal(true);
+      }
+    }
+  }, []);
+
   // Fetch students
   useEffect(() => {
-    
     async function fetchStudents() {
       try {
         const res = await fetch(`/api/students`);
@@ -124,6 +176,11 @@ export default function Home() {
   const totalPaidAmount = safeStudents
     .filter(s => s.payment_status)
     .reduce((sum, s) => sum + (s.payment_amount || 0), 0);
+
+  const handleUpdatesSeen = () => {
+    localStorage.setItem("lastSeenVersion", CURRENT_VERSION);
+    setShowUpdatesModal(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -297,7 +354,7 @@ export default function Home() {
 
       </div>
 
-      {/* ✅ SMS Integrated Modal */}
+      {/* SMS Integrated Modal */}
       {showSmsModal && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-xl text-center relative">
@@ -309,6 +366,56 @@ export default function Home() {
 
             <button
               onClick={() => setShowSmsModal(false)}
+              className="w-full py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition"
+            >
+              Got it!
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* NEW: Updates Modal */}
+      {showUpdatesModal && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-xl text-center relative">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <Info className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+            
+            <h2 className="text-xl font-bold text-gray-900 mb-2">What's New in v{CURRENT_VERSION}</h2>
+            
+            {updatesToShow.new.length > 0 && (
+              <div className="mb-4 text-left">
+                <h3 className="font-semibold text-gray-800 mb-2">New Features:</h3>
+                <ul className="space-y-1">
+                  {updatesToShow.new.map((item, index) => (
+                    <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
+                      <span className="text-green-500 mt-0.5">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
+            {updatesToShow.fixed.length > 0 && (
+              <div className="mb-4 text-left">
+                <h3 className="font-semibold text-gray-800 mb-2">Bug Fixes:</h3>
+                <ul className="space-y-1">
+                  {updatesToShow.fixed.map((item, index) => (
+                    <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
+                      <span className="text-blue-500 mt-0.5">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <button
+              onClick={handleUpdatesSeen}
               className="w-full py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition"
             >
               Got it!
