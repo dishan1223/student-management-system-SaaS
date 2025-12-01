@@ -17,7 +17,7 @@ export default function Home() {
       {/* hero section / header section */}
       <div className="w-full h-screen">
         <Nav />
-        <header className="w-full h-10/12 lg:h-11/12 flex flex-col gap-8 justify-center items-center">
+        <header className="w-full h-10/12 lg:h-11/12 flex flex-col gap-4 justify-center items-center">
           <p className="secondary-font">
             Powered By <span className="primary-font font-bold">Loom Softwares</span>
           </p>
@@ -50,12 +50,19 @@ export default function Home() {
               </li>
             </ul>
           </div>
-          <Link href="/sign-up">
-            <button className="flex gap-2 cursor-pointer px-12 py-3 rounded-md text-white bg-green hover:bg-green-dark hover:gap-4">
-              Sign Up
-              <Image src="/plane.svg" width={15} height={15} alt="plane" />
-            </button>
-          </Link>
+          <div className="flex flex-col gap-2 items-center">
+            <Link href="/sign-up">
+              <button className="flex gap-2 cursor-pointer px-12 py-3 rounded-md text-white bg-green hover:bg-green-dark hover:gap-4">
+                Sign Up
+                <Image src="/plane.svg" width={15} height={15} alt="plane" />
+              </button>
+            </Link>
+            <Link href="/gportal">
+              <button className="cursor-pointer px-12 py-3 rounded-md text-white border-2 border-green-400 primary-font hover:bg-green-200">
+                Guardian Portal
+              </button>
+            </Link>
+          </div>
           <Link className="secondary-font cursor-pointer flex gap-2" href="#learnMore">
             Learn More
             <Image src="/arrow-down.svg" alt="arrow" width={10} height={10} />
