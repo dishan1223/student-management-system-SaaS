@@ -395,7 +395,7 @@ export default function Home() {
               </div>
             </div>
             
-            <h2 className="text-xl font-bold text-gray-900 mb-2">What's New in v{CURRENT_VERSION}</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">What&apos;s New in v{CURRENT_VERSION}</h2>
             
             {updatesToShow.new.length > 0 && (
               <div className="mb-4 text-left">
