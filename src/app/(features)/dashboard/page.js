@@ -26,7 +26,7 @@ import {
 import useRequirePaid from "@/utils/requireAuth";
 
 // Update this version number whenever you release new updates
-const CURRENT_VERSION = "0.2.2";
+const CURRENT_VERSION = "0.2.3";
 
 // Define your updates here
 const UPDATES = {
@@ -39,6 +39,15 @@ const UPDATES = {
   "0.2.2": {
     new: [
       "Added Install PWA button",
+    ],
+    fixed: [
+      "Changed get started  button to signup for better usability",
+    ]
+  },
+  "0.2.3": {
+    new: [
+      "Added Install PWA button",
+      "Attendance submission system",
     ],
     fixed: [
       "Changed get started  button to signup for better usability",
@@ -330,10 +339,13 @@ export default function Home() {
                   title="Notice Board" 
                   icon={Bell}
                 />
-                <ModernDummyButton 
+                <ModernButton 
                   title="Attendance Tracker" 
-                  icon={CheckCircle}
+                  href="/attendance" 
+                  icon={BarChart3}
+                  variant="default"
                 />
+
                 <ModernDummyButton 
                   title="Guardian Portal" 
                   icon={Bell}

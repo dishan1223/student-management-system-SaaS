@@ -86,10 +86,12 @@ export default function AttendancePage() {
 
       if (!response.ok) throw new Error('Failed to save attendance');
       
-      setSubmitSuccess(true);
-      setAbsentStudents(new Set());
-      setTimeout(() => setSubmitSuccess(false), 3000);
+      // --- Backend returned success ---
+      alert('Attendance submitted successfully!');
+      window.location.href = '/dashboard';
+
     } catch (error) {
+      alert("Error Saving attendance");
       console.error('Error saving attendance:', error);
     } finally {
       setIsSubmitting(false);
