@@ -26,7 +26,7 @@ import {
 import useRequirePaid from "@/utils/requireAuth";
 
 // Update this version number whenever you release new updates
-const CURRENT_VERSION = "0.2.1";
+const CURRENT_VERSION = "0.2.2";
 
 // Define your updates here
 const UPDATES = {
@@ -36,6 +36,15 @@ const UPDATES = {
       "Fixed student edit feature",
     ]
   },
+  "0.2.2": {
+    new: [
+      "Added Install PWA button",
+    ],
+    fixed: [
+      "Changed get started  button to signup for better usability",
+    ]
+  },
+
 };
 
 // Modern Button Component
@@ -104,39 +113,43 @@ export default function Home() {
   // NEW: Check for updates
   useEffect(() => {
     const lastSeenVersion = localStorage.getItem("lastSeenVersion");
-    
-    // If user hasn't seen this version before, show updates
-    if (lastSeenVersion !== CURRENT_VERSION) {
-      // Collect all updates since the last seen version
+
+    // Convert version string to number array for proper comparison
+    const parseVersion = (v) => v.split('.').map(Number);
+
+    // Filter versions that are newer than last seen
+    const versionsToShow = Object.keys(UPDATES)
+      .filter(v => {
+        if (!lastSeenVersion) return true;
+        const [vMaj, vMin, vPatch] = parseVersion(v);
+        const [lMaj, lMin, lPatch] = parseVersion(lastSeenVersion);
+        if (vMaj > lMaj) return true;
+        if (vMaj === lMaj && vMin > lMin) return true;
+        if (vMaj === lMaj && vMin === lMin && vPatch > lPatch) return true;
+        return false;
+      })
+      .sort((a, b) => {
+        const [aMaj, aMin, aPatch] = parseVersion(a);
+        const [bMaj, bMin, bPatch] = parseVersion(b);
+        if (aMaj !== bMaj) return aMaj - bMaj;
+        if (aMin !== bMin) return aMin - bMin;
+        return aPatch - bPatch;
+      });
+
+    if (versionsToShow.length > 0) {
       const allUpdates = { new: [], fixed: [] };
-      let shouldShowUpdates = false;
-      
-      // Get all version keys and sort them
-      const versionKeys = Object.keys(UPDATES).sort();
-      
-      // Find the index of the last seen version
-      const lastSeenIndex = lastSeenVersion ? versionKeys.indexOf(lastSeenVersion) : -1;
-      
-      // Collect all updates after the last seen version
-      for (let i = lastSeenIndex + 1; i < versionKeys.length; i++) {
-        const version = versionKeys[i];
-        if (UPDATES[version]) {
-          // FIX: Use nullish coalescing operator to provide empty arrays as defaults
-          const newFeatures = UPDATES[version].new ?? [];
-          const bugFixes = UPDATES[version].fixed ?? [];
-          
-          allUpdates.new.push(...newFeatures);
-          allUpdates.fixed.push(...bugFixes);
-          shouldShowUpdates = true;
-        }
-      }
-      
-      if (shouldShowUpdates) {
+      versionsToShow.forEach(version => {
+        allUpdates.new.push(...(UPDATES[version].new ?? []));
+        allUpdates.fixed.push(...(UPDATES[version].fixed ?? []));
+      });
+
+      if (allUpdates.new.length > 0 || allUpdates.fixed.length > 0) {
         setUpdatesToShow(allUpdates);
         setShowUpdatesModal(true);
       }
     }
   }, []);
+
 
   // Fetch students
   useEffect(() => {
