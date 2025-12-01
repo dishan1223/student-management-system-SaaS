@@ -9,8 +9,8 @@ export default function UpgradePlan() {
   {
       id: "Free",
       name: "Free Trial",
-      validity: "2",
-      price: "Free / 2 month",
+      validity: "1",
+      price: "Free / December",
       features: [
         "Batch & Student Management",
         "Payment Tracker",

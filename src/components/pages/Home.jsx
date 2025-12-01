@@ -52,7 +52,7 @@ export default function Home() {
           </div>
           <Link href="/sign-up">
             <button className="flex gap-2 cursor-pointer px-12 py-3 rounded-md text-white bg-green hover:bg-green-dark hover:gap-4">
-              Get Studify
+              Sign Up
               <Image src="/plane.svg" width={15} height={15} alt="plane" />
             </button>
           </Link>

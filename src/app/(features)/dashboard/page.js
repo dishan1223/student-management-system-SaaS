@@ -7,6 +7,7 @@ import SectionHeader from "@/components/SectionHeader";
 import Search from "@/components/Search";
 import DownloadButton from "@/components/report";
 import DummyButton from "@/components/DummyButton";
+import InstallPWAButton from "@/components/InstallPWAButton";
 import { 
   Users, 
   CheckCircle, 
@@ -187,12 +188,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Header */}
-        <div className="text-center mb-5 lg:mb-6">
-          <h1 className="text-3xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-2">
-            {process.env.NEXT_PUBLIC_CUSTOMER_}
-          </h1>
-          <p className="text-gray-600 text-sm">Manage your teaching dashboard</p>
-        </div>
+        
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-5 lg:mb-6">
@@ -291,6 +287,8 @@ export default function Home() {
             icon={UserPlus}
             variant="success"
           />
+
+          <InstallPWAButton />
           
           <button
             onClick={() => setShowMoreOptions(true)}

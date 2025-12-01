@@ -4,14 +4,14 @@ import { Users, CreditCard, BarChart3, MessageSquare, Bell, GraduationCap, Check
 
 const CONFIG = {
   branding: {
-    name: "EduFlow",
+    name: "Studify",
     logo: "/logo.png", // Change to your logo image path, or set to null to use icon + text
     useTextLogo: true, // Set to false if you want to use an image logo
     tagline: "Manage coaching easily.",
     description: "Focus on teaching while EduFlow takes care of the management."
   },
   hero: {
-    title: "EduFlow - Manage coaching",
+    title: "Studify - Manage coaching",
     highlightedWord: "easily",
     subtitle: "Focus on teaching while EduFlow takes care of the management.",
     features: [
@@ -129,13 +129,13 @@ export default function Navbar({ isLoggedIn = false, onLogout = null }) {
                   <GraduationCap className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xl font-bold text-gray-900">
-                  <span className="text-blue-500">i</span>{CONFIG.branding.name}
+                  Studify
                 </span>
               </>
             ) : (
               <img 
                 src={CONFIG.branding.logo} 
-                alt={CONFIG.branding.name}
+                alt="studify"
                 className="h-8 w-auto"
               />
             )}
