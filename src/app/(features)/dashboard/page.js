@@ -26,7 +26,7 @@ import {
 import useRequirePaid from "@/utils/requireAuth";
 
 // Update this version number whenever you release new updates
-const CURRENT_VERSION = "0.2.3";
+const CURRENT_VERSION = "0.2.4";
 
 // Define your updates here
 const UPDATES = {
@@ -53,6 +53,12 @@ const UPDATES = {
       "Changed get started  button to signup for better usability",
     ]
   },
+  "0.2.4": {
+    fixed: [
+      "- Patch for the new attendance tracking feature. ",
+    ]
+  },
+
 
 };
 

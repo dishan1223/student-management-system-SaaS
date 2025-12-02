@@ -70,7 +70,13 @@ export async function POST(req) {
     const user = await db.collection("users").findOne({ _id: new ObjectId(userId) });
     const smsResults = [];
 
-    for (const s of students) {
+    // this to to get student objects from the database. this is an array.
+    // this object contains students phone number and other data.
+    const studentDocs = await collection
+		  .find({ _id: { $in: students.map(id => new ObjectId(id)) } })
+		  .toArray();
+
+    for (const s of studentDocs) {
       if (!s.phone_number) continue; // skip invalid entries
 
       const phone = formatPhoneNumber(s.phone_number);
