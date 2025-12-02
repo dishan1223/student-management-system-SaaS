@@ -1,36 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+# Studify[www.studify.sbs]
 
-First, run the development server:
+An all in one student management solutions for small coachings and schools. Studify makes students management, results management, and attendance tracking easier. Enhance student progression with guardian portal.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
+> More features are currently under development. We are constantly taking customer feedback in order to make our service better.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Keeps your students and payment data organized
+- Add, remove or edit students data.
+- Publish results via SMS.
+- Attendance tracking
+- Guardian portal
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
 
-## Learn More
+**Client:** Nextjs, TailwindCSS
 
-To learn more about Next.js, take a look at the following resources:
+**Server:** Nextjs
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Database:** Mongodb
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Contributors
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [@Ishtiaq Dishan](https://www.github.com/dishan1223)
+- [@Tasin Rahman](https://github.com/ghostknight07)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
