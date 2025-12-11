@@ -10,15 +10,11 @@ export default function GLogin() {
   const handleSubmit = async () => {
     setError('');
 
-    if (!phoneNumber || !passkey) {
+    if (!phoneNumber ) {
       setError('Please fill in all fields');
       return;
     }
 
-    if (phoneNumber.length !== 11) {
-      setError('Phone number must be 11 digits');
-      return;
-    }
 
     setIsLoading(true);
 
@@ -30,7 +26,6 @@ export default function GLogin() {
         },
         body: JSON.stringify({
           phone_number: phoneNumber,
-          passkey: passkey,
         }),
       });
 
@@ -91,7 +86,6 @@ export default function GLogin() {
                   required
                   className="block w-full bg-gray-50 pl-9 sm:pl-10 pr-3 py-2.5 sm:py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white transition-all outline-none text-gray-900"
                   placeholder="01234567890"
-                  maxLength="11"
                 />
               </div>
             </div>

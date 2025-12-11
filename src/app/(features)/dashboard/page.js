@@ -28,7 +28,7 @@ import {
 import useRequirePaid from "@/utils/requireAuth";
 
 // Update this version number whenever you release new updates
-const CURRENT_VERSION = "0.2.4";
+const CURRENT_VERSION = "0.2.04";
 
 // Define your updates here
 const UPDATES = {
@@ -56,8 +56,13 @@ const UPDATES = {
     ]
   },
   "0.2.4": {
-    fixed: [
+    new: [
       "- Patch for the new attendance tracking feature. ",
+    ]
+  },
+  "0.2.5": {
+    fixed: [
+      "- Guardian Portal ",
     ]
   },
 };
@@ -172,41 +177,22 @@ export default function Home() {
 
   // NEW: Check for updates
   useEffect(() => {
+    // Only show updates for the current release.
+    // If the user has already seen CURRENT_VERSION, do nothing.
     const lastSeenVersion = localStorage.getItem("lastSeenVersion");
+    if (lastSeenVersion === CURRENT_VERSION) {
+      return;
+    }
 
-    // Convert version string to number array for proper comparison
-    const parseVersion = (v) => v.split('.').map(Number);
+    const currentUpdates = UPDATES[CURRENT_VERSION] ?? { new: [], fixed: [] };
+    const hasNew = (currentUpdates.new && currentUpdates.new.length > 0) || (currentUpdates.fixed && currentUpdates.fixed.length > 0);
 
-    // Filter versions that are newer than last seen
-    const versionsToShow = Object.keys(UPDATES)
-      .filter(v => {
-        if (!lastSeenVersion) return true;
-        const [vMaj, vMin, vPatch] = parseVersion(v);
-        const [lMaj, lMin, lPatch] = parseVersion(lastSeenVersion);
-        if (vMaj > lMaj) return true;
-        if (vMaj === lMaj && vMin > lMin) return true;
-        if (vMaj === lMaj && vMin === lMin && vPatch > lPatch) return true;
-        return false;
-      })
-      .sort((a, b) => {
-        const [aMaj, aMin, aPatch] = parseVersion(a);
-        const [bMaj, bMin, bPatch] = parseVersion(b);
-        if (aMaj !== bMaj) return aMaj - bMaj;
-        if (aMin !== bMin) return aMin - bMin;
-        return aPatch - bPatch;
+    if (hasNew) {
+      setUpdatesToShow({
+        new: currentUpdates.new ?? [],
+        fixed: currentUpdates.fixed ?? []
       });
-
-    if (versionsToShow.length > 0) {
-      const allUpdates = { new: [], fixed: [] };
-      versionsToShow.forEach(version => {
-        allUpdates.new.push(...(UPDATES[version].new ?? []));
-        allUpdates.fixed.push(...(UPDATES[version].fixed ?? []));
-      });
-
-      if (allUpdates.new.length > 0 || allUpdates.fixed.length > 0) {
-        setUpdatesToShow(allUpdates);
-        setShowUpdatesModal(true);
-      }
+      setShowUpdatesModal(true);
     }
   }, []);
 

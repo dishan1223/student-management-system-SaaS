@@ -11,6 +11,30 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
 
+function formatPhoneNumber(phone) {
+  if (!phone) throw new Error("Phone number is required");
+
+  //Remove spaces, dashes, and parentheses
+  phone = phone.replace(/[\s\-\(\)]/g, "");
+
+  // change format to different types of number method
+  if (phone.startsWith("+880")) {
+    // e.g. +8801727932635 → 8801727932635
+    return phone.slice(1);
+  } else if (phone.startsWith("880")) {
+    // e.g. 8801727932635 → 8801727932635 (already fine)
+    return phone;
+  } else if (phone.startsWith("0")) {
+    // e.g. 01727932635 → 8801727932635
+    return "88" + phone;
+  } else if (/^1\d{9}$/.test(phone)) {
+    // e.g. 1727932635 → 8801727932635
+    return "880" + phone;
+  }
+
+  throw new Error("Invalid Bangladeshi phone number format");
+}
+
 export async function POST(req) {
   let student;
   try {
@@ -30,9 +54,12 @@ export async function POST(req) {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
 
+
   // Assign a new ObjectId and createdBy
   student._id = new ObjectId();
   student.createdBy = new ObjectId(decoded.userId);
+  // format students phone number
+  student.phone_number = formatPhoneNumber(student.phone_number);
 
   let client;
   try {
