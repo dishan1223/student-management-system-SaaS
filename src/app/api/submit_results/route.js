@@ -10,6 +10,7 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
 
+// --- SMS message template ---
 function MarksTemplate(name, total, subject, obtainedMarks) {
   return `Dear ${name},  
 Your ${subject} exam results have been published.  
@@ -17,32 +18,31 @@ Total Marks: ${total}
 Obtained Marks: ${obtainedMarks} \n`;
 }
 
-
-// i will forget the algorithm next day. so please no one should touch this formating function
+// --- Phone number formatting function (do not modify) ---
 function formatPhoneNumber(phone) {
   if (!phone) throw new Error("Phone number is required");
 
-  //Remove spaces, dashes, and parentheses
+  // Remove spaces, dashes, and parentheses
   phone = phone.replace(/[\s\-\(\)]/g, "");
 
-  // change format to different types of number method
+  if (/^8801\d{9}$/.test(phone)) {
+    return phone; // e.g. 8801773153889 stays same
+  }
+
   if (phone.startsWith("+880")) {
-    // e.g. +8801727932635 → 8801727932635
-    return phone.slice(1);
+    return phone.slice(1); // +8801773153889 → 8801773153889
   } else if (phone.startsWith("880")) {
-    // e.g. 8801727932635 → 8801727932635 (already fine)
-    return phone;
+    return phone; // already fine
   } else if (phone.startsWith("0")) {
-    // e.g. 01727932635 → 8801727932635
-    return "88" + phone;
+    return "88" + phone; // 01773153889 → 8801773153889
   } else if (/^1\d{9}$/.test(phone)) {
-    // e.g. 1727932635 → 8801727932635
-    return "880" + phone;
+    return "880" + phone; // 1773153889 → 8801773153889
   }
 
   throw new Error("Invalid Bangladeshi phone number format");
 }
 
+// --- POST handler ---
 export async function POST(req) {
   let students;
   try {
@@ -74,10 +74,9 @@ export async function POST(req) {
     const smsResults = [];
 
     for (const s of students) {
-      if (!s.marks?.length || !s.phone_number) continue; // skip invalid entries
+      if (!s.marks?.length) continue; // skip if no marks
 
       const mark = s.marks[0];
-      const phone = formatPhoneNumber(s.phone_number);
       const name = s.student_name || "Student";
 
       // --- Save marks in MongoDB ---
@@ -100,22 +99,24 @@ export async function POST(req) {
         ]
       );
 
-      // --- Send SMS ---
+      // --- Try sending SMS ---
+      let phone;
+      try {
+        phone = formatPhoneNumber(s.phone_number);
+      } catch {
+        console.warn(`Skipping SMS for ${name}: invalid phone number (${s.phone_number})`);
+        smsResults.push({ phone: s.phone_number || null, success: false, error: "Invalid phone number" });
+        continue; // skip SMS but not DB
+      }
+
       const message = MarksTemplate(name, mark.total, mark.subject, mark.obtained);
 
       try {
-        // FIX: content MUST be an array according to API docs
         const payload = [
-          {
-            callerID: "loomsoftwares",
-            toUser: phone,
-            messageContent: message,
-          }
+          { callerID: "loomsoftwares", toUser: phone, messageContent: message }
         ];
 
-        const url = `http://118.67.213.114:3775/send?apikey=${process.env.SMS_API_KEY}&secretkey=${process.env.SMS_SECRET_KEY}&content=${encodeURIComponent(
-          JSON.stringify(payload)
-        )}`;
+        const url = `http://118.67.213.114:3775/send?apikey=${process.env.SMS_API_KEY}&secretkey=${process.env.SMS_SECRET_KEY}&content=${encodeURIComponent(JSON.stringify(payload))}`;
 
         const response = await fetch(url, { method: "GET" });
         const result = await response.text();
@@ -139,7 +140,7 @@ export async function POST(req) {
 
     return NextResponse.json({
       success: true,
-      message: "Marks added & SMS sent!",
+      message: "Marks added & SMS processed!",
       smsResults,
     });
   } catch (err) {
