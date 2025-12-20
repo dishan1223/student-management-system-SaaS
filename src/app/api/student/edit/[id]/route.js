@@ -77,7 +77,9 @@ export async function PATCH(req, { params }) {
     }
 
     // format phone number before updating.
-    updateData.phone_number = formatPhoneNumber(updateData.phone_number);
+    if(updateData.phone_number){
+      updateData.phone_number = formatPhoneNumber(updateData.phone_number);
+    }
 
     if (key === "payment_amount") {
       const num = parseFloat(value);
