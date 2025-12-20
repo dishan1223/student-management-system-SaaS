@@ -63,6 +63,7 @@ export async function PATCH(req, { params }) {
   let updateData;
   try {
     updateData = await req.json();
+    console.log(updateData);
   } catch(err) {
     console.log(err)
     return NextResponse.json({ error: "Cannot parse request body" }, { status: 400 });
@@ -77,7 +78,10 @@ export async function PATCH(req, { params }) {
     }
 
     // format phone number before updating.
-    updateData.phone_number = formatPhoneNumber(updateData.phone_number);
+    if(updateData.phone_number){
+      updateData.phone_number = formatPhoneNumber(updateData.phone_number);
+    }
+
 
     if (key === "payment_amount") {
       const num = parseFloat(value);
